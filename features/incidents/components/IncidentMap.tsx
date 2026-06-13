@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-
 import { IncidentData } from "../types";
 import MapChrome from "./MapChrome";
 import IncidentForm from "./IncidentForm";
@@ -24,6 +23,7 @@ export default function Map() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   const incidentMarkersRef = useRef<mapboxgl.Marker[]>([]);
+
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -60,9 +60,7 @@ export default function Map() {
     };
     try {
       map.addLayer(layer as Parameters<mapboxgl.Map["addLayer"]>[0]);
-    } catch {
-      // la capa de edificios puede no existir en algunos estilos
-    }
+    } catch {}
   };
 
   const stopOrbit = () => {
@@ -181,8 +179,6 @@ export default function Map() {
           address: "Error al cargar la dirección",
         });
       }
-
-      setShowForm(true);
     });
 
     return () => {
@@ -272,6 +268,14 @@ export default function Map() {
             lastIncident && setSelectedIncident(lastIncident)
           }
           canShowDetails={!!lastIncident}
+          onCreateIncident={() => {
+            if (!selectedLocation) {
+              alert("Primero selecciona una ubicación en el mapa");
+              return;
+            }
+
+            setShowForm(true);
+          }}
         />
       </div>
 

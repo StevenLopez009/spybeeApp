@@ -10,6 +10,7 @@ interface MapChromeProps {
   canOrbit: boolean;
   onShowDetails: () => void;
   canShowDetails: boolean;
+  onCreateIncident: () => void;
 }
 
 /* ----- helpers de iconos (outline tipo Lucide) ----- */
@@ -129,16 +130,19 @@ function ToolBtn({
   active,
   className = "",
   title,
+  onClick,
 }: {
   children: ReactNode;
   active?: boolean;
   className?: string;
   title?: string;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
       title={title}
+      onClick={onClick}
       className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
         active ? "bg-amber-400 text-white" : "text-gray-600 hover:bg-gray-100"
       } ${className}`}
@@ -156,6 +160,7 @@ export default function MapChrome({
   canOrbit,
   onShowDetails,
   canShowDetails,
+  onCreateIncident,
 }: MapChromeProps) {
   return (
     <>
@@ -210,25 +215,9 @@ export default function MapChrome({
         </button>
       </div>
 
-      {/* Top-right: Comparar */}
-      <div className="absolute right-20 top-4 z-10 hidden items-center gap-2 lg:flex">
-        <button
-          type="button"
-          className="rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-amber-500"
-        >
-          Comparar
-        </button>
-        <button
-          type="button"
-          className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-md transition hover:bg-gray-50"
-        >
-          Comparar BIM
-        </button>
-      </div>
-
       {/* Right: barra de herramientas vertical */}
       <div className="absolute right-3 top-3 z-10 hidden flex-col items-center gap-1 rounded-2xl bg-white p-1.5 shadow-md md:flex">
-        <ToolBtn active title="Crear">
+        <ToolBtn active title="Crear" onClick={onCreateIncident}>
           <Svg>{I.plus}</Svg>
         </ToolBtn>
         <ToolBtn title="Documentos">
@@ -255,19 +244,6 @@ export default function MapChrome({
         </ToolBtn>
       </div>
 
-      {/* Bottom-left: herramientas de mapa */}
-      <div className="absolute bottom-4 left-4 z-10 hidden flex-col gap-2 md:flex">
-        {[I.locate, I.map, I.bookmarkMap, I.triangle].map((icon, i) => (
-          <button
-            key={i}
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-gray-600 shadow-md transition hover:bg-gray-50"
-          >
-            <Svg size={18}>{icon}</Svg>
-          </button>
-        ))}
-      </div>
-
       {/* Bottom-center: 2D/3D + 360° */}
       <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-xl bg-white p-1 shadow-md">
         <button
@@ -291,20 +267,7 @@ export default function MapChrome({
           3D
         </button>
         <div className="mx-1 hidden h-5 w-px bg-gray-200 sm:block" />
-        <button
-          type="button"
-          title="Time-lapse"
-          className="hidden h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 sm:flex"
-        >
-          <Svg size={18}>{I.clock}</Svg>
-        </button>
-        <button
-          type="button"
-          title="Recorrido"
-          className="hidden h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 sm:flex"
-        >
-          <Svg size={18}>{I.film}</Svg>
-        </button>
+
         <button
           type="button"
           onClick={() => onSet360(!is360)}
