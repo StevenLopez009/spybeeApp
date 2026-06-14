@@ -1,5 +1,6 @@
 "use client";
 
+import { Incident } from "@/features/incidents/types/incidents";
 import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { useMemo, useState } from "react";
@@ -17,141 +18,125 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import IncidentsTable from "./IncidentsTable";
+import IncidentHeatMap from "./IncidentHeatMap";
+import ActivityCalendar from "./ActivityCalendar";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface Props {
-  incidents: any[];
+  incidents: Incident[];
 }
 
 export default function ReportsClient({ incidents }: Props) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [dateRange, setDateRange] = useState<
     [Dayjs | null, Dayjs | null] | null
   >(null);
-
-  const STATUS_COLORS = ["#3B82F6", "#22C55E", "#F59E0B"];
-  const PRIORITY_COLORS = ["#EF4444", "#F59E0B", "#22C55E"];
+  const [selectedDate, setSelectedDate] = useState<Date>();
 
   const { RangePicker } = DatePicker;
 
-  const filteredIncidents = incidents.filter((incident) => {
-    if (!dateRange) return true;
+  const processedData = useMemo(() => {
+    const [start, end] = dateRange || [null, null];
 
-    const [start, end] = dateRange;
+    const filtered = incidents.filter((incident) => {
+      if (!start || !end) return true;
 
-    if (!start || !end) return true;
+      const createdAt = dayjs(incident.createdAt);
+      return (
+        createdAt.isAfter(start.startOf("day")) &&
+        createdAt.isBefore(end.endOf("day"))
+      );
+    });
 
-    const createdAt = dayjs(incident.createdAt);
+    let open = 0;
+    let closed = 0;
+    let paused = 0;
+    let high = 0;
+    let medium = 0;
+    let low = 0;
+    let overdue = 0;
 
-    return (
-      createdAt.isAfter(start.startOf("day")) &&
-      createdAt.isBefore(end.endOf("day"))
-    );
-  });
+    filtered.forEach((i) => {
+      // Status
+      if (i.status === "open") open++;
+      else if (i.status === "closed") closed++;
+      else if (i.status === "on_pause") paused++;
 
-  const overdueIncidents = filteredIncidents.filter((incident) => {
-    const isActive =
-      incident.status === "open" || incident.status === "on_pause";
+      // Priority
+      if (i.priority === "high") high++;
+      else if (i.priority === "medium") medium++;
+      else if (i.priority === "low") low++;
 
-    const hasDueDate = !!incident.dueDate;
+      // Overdue
+      const isActive = i.status === "open" || i.status === "on_pause";
+      const hasDueDate = !!i.dueDate;
+      const isOverdue =
+        hasDueDate && new Date(i.dueDate) < new Date() && isActive;
+      if (isOverdue) overdue++;
+    });
 
-    const isOverdue = hasDueDate && new Date(incident.dueDate) < new Date();
+    const total = filtered.length;
+    const closureRate = total > 0 ? ((closed / total) * 100).toFixed(1) : "0";
 
-    return isActive && isOverdue;
-  }).length;
+    const statusData = [
+      { name: "Abiertas", value: open },
+      { name: "Cerradas", value: closed },
+      { name: "En pausa", value: paused },
+    ];
 
-  const totalIncidents = filteredIncidents.length;
+    const priorityData = [
+      { name: "Alta", value: high },
+      { name: "Media", value: medium },
+      { name: "Baja", value: low },
+    ];
 
-  const openIncidents = filteredIncidents.filter(
-    (incident) => incident.status === "open",
-  ).length;
-
-  const closedIncidents = filteredIncidents.filter(
-    (incident) => incident.status === "closed",
-  ).length;
-
-  const pausedIncidents = filteredIncidents.filter(
-    (incident) => incident.status === "on_pause",
-  ).length;
-
-  const closureRate = ((closedIncidents / totalIncidents) * 100).toFixed(1);
-
-  const statusData = [
-    {
-      name: "Abiertas",
-      value: openIncidents,
-    },
-    {
-      name: "Cerradas",
-      value: closedIncidents,
-    },
-    {
-      name: "En pausa",
-      value: pausedIncidents,
-    },
-  ];
-
-  const highPriority = filteredIncidents.filter(
-    (i) => i.priority === "high",
-  ).length;
-
-  const mediumPriority = filteredIncidents.filter(
-    (i) => i.priority === "medium",
-  ).length;
-
-  const lowPriority = filteredIncidents.filter(
-    (i) => i.priority === "low",
-  ).length;
-
-  const priorityData = [
-    {
-      name: "Alta",
-      value: highPriority,
-    },
-    {
-      name: "Media",
-      value: mediumPriority,
-    },
-    {
-      name: "Baja",
-      value: lowPriority,
-    },
-  ];
+    return {
+      filtered,
+      total,
+      open,
+      closed,
+      paused,
+      overdue,
+      closureRate,
+      statusData,
+      priorityData,
+    };
+  }, [incidents, dateRange]);
 
   const chartData = useMemo(() => {
-    if (filteredIncidents.length === 0) return [];
+    const { filtered } = processedData;
+    if (filtered.length === 0) return [];
 
-    // 1. Definir rango de fechas
+    const [startDayjs, endDayjs] = dateRange || [null, null];
+
     let start =
-      dateRange?.[0] ||
-      dayjs(
-        Math.min(
-          ...filteredIncidents.map((i) => new Date(i.createdAt).getTime()),
-        ),
-      );
-    let end = dateRange?.[1] || dayjs();
+      startDayjs ||
+      dayjs(Math.min(...filtered.map((i) => new Date(i.createdAt).getTime())));
+    let end = endDayjs || dayjs();
 
-    const dates = [];
+    const dates: string[] = [];
     let current = start.clone();
     while (current.isBefore(end) || current.isSame(end, "day")) {
       dates.push(current.format("YYYY-MM-DD"));
       current = current.add(1, "day");
     }
 
-    // 2. Calcular Backlog Inicial (incidencias abiertas antes del rango)
-    let cumulativeBacklog = incidents.filter(
-      (i) =>
-        dayjs(i.createdAt).isBefore(start) &&
-        (i.status !== "closed" ||
-          dayjs(i.closedAt || i.updatedAt).isAfter(start)),
-    ).length;
+    // Backlog
+    let cumulativeBacklog = incidents.filter((i) => {
+      const created = dayjs(i.createdAt);
+      const closedAt = i.closedAt || i.updatedAt;
+      return (
+        created.isBefore(start) &&
+        (!i.status || i.status !== "closed" || dayjs(closedAt).isAfter(start))
+      );
+    }).length;
 
-    // 3. Generar datos diarios
     return dates.map((date) => {
-      const dayCreated = filteredIncidents.filter((i) =>
+      const dayCreated = filtered.filter((i) =>
         dayjs(i.createdAt).isSame(date, "day"),
       ).length;
-      const dayClosed = filteredIncidents.filter(
+
+      const dayClosed = filtered.filter(
         (i) =>
           i.status === "closed" &&
           dayjs(i.closedAt || i.updatedAt).isSame(date, "day"),
@@ -163,10 +148,13 @@ export default function ReportsClient({ incidents }: Props) {
         date: dayjs(date).format("DD/MM"),
         created: dayCreated,
         closed: dayClosed,
-        backlog: cumulativeBacklog,
+        backlog: Math.max(0, cumulativeBacklog),
       };
     });
-  }, [filteredIncidents, dateRange, incidents]);
+  }, [processedData.filtered, dateRange, incidents]);
+
+  const STATUS_COLORS = ["#3B82F6", "#22C55E", "#F59E0B"];
+  const PRIORITY_COLORS = ["#EF4444", "#F59E0B", "#22C55E"];
 
   return (
     <div className="p-6">
@@ -182,33 +170,32 @@ export default function ReportsClient({ incidents }: Props) {
       <div className="grid grid-cols-4 gap-4">
         <div className="rounded-xl border p-6">
           <p>Total</p>
-          <p className="text-4xl font-bold">{totalIncidents}</p>
+          <p className="text-4xl font-bold">{processedData.total}</p>
         </div>
 
         <div className="rounded-xl border p-6">
           <p>Abiertas</p>
-          <p className="text-4xl font-bold">{openIncidents}</p>
+          <p className="text-4xl font-bold">{processedData.open}</p>
         </div>
 
         <div className="rounded-xl border p-6">
           <p>Cerradas</p>
-          <p className="text-4xl font-bold">{closedIncidents}</p>
+          <p className="text-4xl font-bold">{processedData.closed}</p>
         </div>
 
         <div className="rounded-xl border p-6">
           <p>En pausa</p>
-          <p className="text-4xl font-bold">{pausedIncidents}</p>
+          <p className="text-4xl font-bold">{processedData.paused}</p>
         </div>
 
         <div className="rounded-xl border p-6">
-          {" "}
-          <p>Tasa de Cierre</p>{" "}
-          <p className="text-4xl font-bold">{closureRate}</p>{" "}
+          <p>Tasa de Cierre</p>
+          <p className="text-4xl font-bold">{processedData.closureRate}</p>
         </div>
         <div className="rounded-xl border p-6">
           <p>Vencidas activas</p>
 
-          <p className="text-4xl font-bold">{overdueIncidents}</p>
+          <p className="text-4xl font-bold">{processedData.overdue}</p>
         </div>
         <div className="rounded-xl border bg-white p-6">
           <h3 className="mb-4 text-lg font-semibold text-black">
@@ -218,20 +205,19 @@ export default function ReportsClient({ incidents }: Props) {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={statusData}
+                data={processedData.statusData}
                 dataKey="value"
                 nameKey="name"
                 outerRadius={100}
                 label
               >
-                {statusData.map((entry, index) => (
+                {processedData.statusData.map((_, index) => (
                   <Cell
                     key={index}
                     fill={STATUS_COLORS[index % STATUS_COLORS.length]}
                   />
                 ))}
               </Pie>
-
               <Tooltip />
               <Legend />
             </PieChart>
@@ -245,13 +231,13 @@ export default function ReportsClient({ incidents }: Props) {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={priorityData}
+                data={processedData.priorityData}
                 dataKey="value"
                 nameKey="name"
                 outerRadius={100}
                 label
               >
-                {priorityData.map((entry, index) => (
+                {processedData.statusData.map((entry, index) => (
                   <Cell
                     key={index}
                     fill={PRIORITY_COLORS[index % PRIORITY_COLORS.length]}
@@ -265,15 +251,13 @@ export default function ReportsClient({ incidents }: Props) {
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="rounded-xl border bg-white p-6 mt-6 col-span-4">
-        <h3 className="mb-4 text-lg font-semibold text-black">
-          Tendencia de Incidencias
-        </h3>
+      <div className="mt-6 rounded-xl border bg-white p-6">
+        <h3 className="mb-4 text-lg font-semibold">Tendencia de Incidencias</h3>
         <ResponsiveContainer width="100%" height={400}>
           <ComposedChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis yAxisId="left" orientation="left" />
+            <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip />
             <Legend />
@@ -299,6 +283,20 @@ export default function ReportsClient({ incidents }: Props) {
             />
           </ComposedChart>
         </ResponsiveContainer>
+      </div>
+      <IncidentsTable incidents={incidents} />
+      <div className="mt-6 grid grid-cols-12 gap-6">
+        <div className="col-span-9">
+          <IncidentHeatMap incidents={processedData.filtered} />
+        </div>
+
+        <div className="col-span-3">
+          <ActivityCalendar
+            incidents={processedData.filtered}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+          />
+        </div>
       </div>
     </div>
   );

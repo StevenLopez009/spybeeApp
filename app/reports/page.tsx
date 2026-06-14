@@ -1,4 +1,4 @@
-import ReportsClient from "./ReportClients";
+import ReportsClient from "../../features/reports/components/ReportClients";
 
 async function getIncidents() {
   const response = await fetch(
