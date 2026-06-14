@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { useMemo } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -10,10 +9,13 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 interface IncidentLocation {
   id: string;
   title: string;
-  latitude: number;
-  longitude: number;
   priority: string;
   status: string;
+
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }
 
 interface Props {
@@ -27,82 +29,61 @@ export default function IncidentHeatMap({ incidents }: Props) {
   const geojson = useMemo(
     () => ({
       type: "FeatureCollection" as const,
-      features: incidents.map((incident) => ({
-        type: "Feature" as const,
-
-        properties: {
-          id: incident.id,
-          title: incident.title,
-          priority: incident.priority,
-          status: incident.status,
-        },
-
-        geometry: {
-          type: "Point" as const,
-          coordinates: [incident.coordinates.lng, incident.coordinates.lat],
-        },
-      })),
+      features: incidents
+        .filter(
+          (incident) =>
+            typeof incident.coordinates.lat === "number" &&
+            typeof incident.coordinates.lng === "number",
+        )
+        .map((incident) => ({
+          type: "Feature" as const,
+          properties: {
+            id: incident.id,
+            title: incident.title,
+            priority: incident.priority,
+            status: incident.status,
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [incident.coordinates.lng, incident.coordinates.lat],
+          },
+        })),
     }),
     [incidents],
   );
 
+  // Crear mapa una sola vez
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || mapRef.current) return;
 
-    if (mapRef.current) return;
-
-    mapRef.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-
       center: [-74.2301, 4.7058],
-      zoom: 15,
+      zoom: 14,
     });
 
-    return () => {
-      mapRef.current?.remove();
-    };
-  }, []);
+    mapRef.current = map;
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    const map = mapRef.current;
-
-    const loadHeatmap = () => {
-      const sourceId = "incidents";
-
-      if (map.getLayer("heatmap")) {
-        map.removeLayer("heatmap");
-      }
-
-      if (map.getLayer("incident-points")) {
-        map.removeLayer("incident-points");
-      }
-
-      if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-      }
-
-      map.addSource(sourceId, {
+    map.on("load", () => {
+      map.addSource("incidents", {
         type: "geojson",
-        data: geojson,
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
       });
 
       map.addLayer({
         id: "heatmap",
         type: "heatmap",
-        source: sourceId,
-
+        source: "incidents",
+        maxzoom: 18,
         paint: {
           "heatmap-weight": 1,
-
           "heatmap-intensity": 2,
-
           "heatmap-radius": 40,
-
           "heatmap-opacity": 0.8,
-
           "heatmap-color": [
             "interpolate",
             ["linear"],
@@ -126,8 +107,7 @@ export default function IncidentHeatMap({ incidents }: Props) {
       map.addLayer({
         id: "incident-points",
         type: "circle",
-        source: sourceId,
-
+        source: "incidents",
         paint: {
           "circle-radius": 6,
           "circle-color": "#FFD700",
@@ -135,14 +115,54 @@ export default function IncidentHeatMap({ incidents }: Props) {
           "circle-stroke-color": "#FFFFFF",
         },
       });
+
+      const source = map.getSource("incidents") as mapboxgl.GeoJSONSource;
+
+      source.setData(geojson);
+
+      // fuerza recalculo del canvas
+      setTimeout(() => {
+        map.resize();
+      }, 100);
+    });
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  // Actualizar datos cuando cambien las incidencias
+  useEffect(() => {
+    const map = mapRef.current;
+
+    if (!map) return;
+
+    const updateData = () => {
+      const source = map.getSource("incidents");
+
+      if (!source) return;
+
+      (source as mapboxgl.GeoJSONSource).setData(geojson);
     };
 
     if (map.isStyleLoaded()) {
-      loadHeatmap();
+      updateData();
     } else {
-      map.once("load", loadHeatmap);
+      map.once("load", updateData);
     }
   }, [geojson]);
 
-  return <div ref={mapContainer} className="w-full h-[600px] rounded-xl" />;
+  return (
+    <div className="rounded-xl border bg-white p-4">
+      <h3 className="mb-4 text-lg font-semibold">
+        Mapa de calor de incidencias
+      </h3>
+
+      <div
+        ref={mapContainer}
+        className="h-[600px] w-full rounded-lg overflow-hidden"
+      />
+    </div>
+  );
 }

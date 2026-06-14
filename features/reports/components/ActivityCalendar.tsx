@@ -1,15 +1,15 @@
 "use client";
 
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
+import dayjs from "dayjs";
+import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { useMemo } from "react";
 import { Incident } from "@/features/incidents/types/incidents";
 
 interface Props {
   incidents: Incident[];
   selectedDate?: Date;
-  onSelectDate?: (date: Date | undefined) => void;
+  onSelectDate?: (date: Date) => void;
 }
 
 export default function ActivityCalendar({
@@ -17,62 +17,122 @@ export default function ActivityCalendar({
   selectedDate,
   onSelectDate,
 }: Props) {
+  const [currentMonth, setCurrentMonth] = useState(dayjs());
+
   const incidentsByDay = useMemo(() => {
     const result: Record<string, number> = {};
 
     incidents.forEach((incident) => {
-      const date = incident.createdAt.split("T")[0];
+      const key = dayjs(incident.createdAt).format("YYYY-MM-DD");
 
-      result[date] = (result[date] || 0) + 1;
+      result[key] = (result[key] || 0) + 1;
     });
 
     return result;
   }, [incidents]);
 
+  const calendarDays = useMemo(() => {
+    const startOfMonth = currentMonth.startOf("month");
+    const startDate = startOfMonth.startOf("week");
+
+    return Array.from({ length: 42 }, (_, index) =>
+      startDate.add(index, "day"),
+    );
+  }, [currentMonth]);
+
+  const weekDays = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
+
+  const getBadgeColor = (count: number) => {
+    if (count >= 5) return "bg-orange-400";
+    if (count >= 3) return "bg-yellow-400";
+
+    return "bg-yellow-200";
+  };
+
   return (
-    <div className="rounded-xl border bg-white p-6">
-      <h3 className="text-lg font-semibold">Calendario de actividad</h3>
+    <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <h3 className="text-2xl font-bold text-slate-800">
+        Calendario de actividad
+      </h3>
 
-      <p className="mb-4 text-sm text-gray-500">Incidencias creadas por día</p>
+      <p className="mt-1 text-sm text-slate-500">Incidencias creadas por día</p>
 
-      <DayPicker
-        mode="single"
-        selected={selectedDate}
-        onSelect={onSelectDate}
-        showOutsideDays
-        components={{
-          DayContent: ({ date }) => {
-            const key = date.toISOString().split("T")[0];
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          onClick={() => setCurrentMonth((prev) => prev.subtract(1, "month"))}
+          className="flex h-12 w-12 items-center justify-center rounded-xl border bg-white hover:bg-slate-50"
+        >
+          <ChevronLeft size={18} />
+        </button>
 
-            const count = incidentsByDay[key] || 0;
+        <div className="flex gap-3">
+          <div className="flex h-12 min-w-[110px] items-center justify-center rounded-xl border px-4 font-semibold">
+            {currentMonth.format("YYYY")}
+          </div>
 
-            return (
-              <div className="relative flex h-10 w-10 items-center justify-center">
-                <span>{date.getDate()}</span>
+          <div className="flex h-12 min-w-[110px] items-center justify-center rounded-xl border px-4 font-semibold capitalize">
+            {currentMonth.format("MMM")}
+          </div>
+        </div>
+
+        <button
+          onClick={() => setCurrentMonth((prev) => prev.add(1, "month"))}
+          className="flex h-12 w-12 items-center justify-center rounded-xl border bg-white hover:bg-slate-50"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+
+      <div className="mt-8 grid grid-cols-7 gap-2 text-center text-sm font-semibold text-slate-500">
+        {weekDays.map((day) => (
+          <div key={day}>{day}</div>
+        ))}
+      </div>
+
+      <div className="mt-3 grid grid-cols-7 gap-2">
+        {calendarDays.map((date) => {
+          const key = date.format("YYYY-MM-DD");
+
+          const count = incidentsByDay[key] || 0;
+
+          const isCurrentMonth = date.month() === currentMonth.month();
+
+          const isSelected =
+            selectedDate && dayjs(selectedDate).isSame(date, "day");
+
+          return (
+            <button
+              key={key}
+              onClick={() => onSelectDate?.(date.toDate())}
+              className={`
+                relative h-16 rounded-xl transition-all
+                ${
+                  isSelected
+                    ? "bg-slate-800 text-white"
+                    : "bg-slate-100 hover:bg-slate-200"
+                }
+                ${!isCurrentMonth ? "opacity-30" : ""}
+              `}
+            >
+              <div className="flex h-full flex-col items-center justify-center">
+                <span className="text-sm font-medium">{date.date()}</span>
 
                 {count > 0 && (
                   <div
                     className={`
-                      absolute bottom-0 right-0
-                      flex h-5 w-5 items-center justify-center
-                      rounded-full text-xs text-white
-                      ${
-                        count >= 3
-                          ? "bg-red-500"
-                          : count >= 2
-                            ? "bg-orange-500"
-                            : "bg-yellow-500"
-                      }
+                      mt-1 flex h-6 w-6 items-center justify-center
+                      rounded-full text-xs font-bold text-slate-800
+                      ${getBadgeColor(count)}
                     `}
                   >
                     {count}
                   </div>
                 )}
               </div>
-            );
-          },
-        }}
-      />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
