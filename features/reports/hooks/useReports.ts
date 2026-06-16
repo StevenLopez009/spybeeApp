@@ -2,15 +2,48 @@ import { useMemo } from "react";
 import dayjs from "dayjs";
 
 import { useReportsStore } from "../store/reports.store";
-import { getProcessedData } from "../selectors/reports.selector";
+import {
+  getProcessedData,
+  getTopReporters,
+  getTopResolvers,
+  getCurrentWorkload,
+} from "../selectors/reports.selector";
 
 export function useReports() {
   const incidents = useReportsStore((state) => state.incidents);
   const dateRange = useReportsStore((state) => state.dateRange);
+  const filters = useReportsStore((state) => state.filters);
 
-  const processedData = useMemo(
-    () => getProcessedData(incidents, dateRange),
-    [incidents, dateRange],
+  const processedData = useMemo(() => {
+    const filteredIncidents = incidents.filter((incident) => {
+      const ownerMatch =
+        !filters.createdBy || incident.owner?.id === filters.createdBy;
+
+      const assigneeMatch =
+        !filters.assignedTo ||
+        incident.assignees.some(
+          (assignee) => assignee.id === filters.assignedTo,
+        );
+
+      return ownerMatch && assigneeMatch;
+    });
+
+    return getProcessedData(filteredIncidents, dateRange);
+  }, [incidents, dateRange, filters]);
+
+  const reportersData = useMemo(
+    () => getTopReporters(processedData.filtered),
+    [processedData.filtered],
+  );
+
+  const resolversData = useMemo(
+    () => getTopResolvers(processedData.filtered),
+    [processedData.filtered],
+  );
+
+  const workloadData = useMemo(
+    () => getCurrentWorkload(processedData.filtered),
+    [processedData.filtered],
   );
 
   const chartData = useMemo(() => {
@@ -82,5 +115,8 @@ export function useReports() {
     processedData,
     chartData,
     categoryData,
+    reportersData,
+    resolversData,
+    workloadData,
   };
 }

@@ -1,0 +1,74 @@
+@use "@/styles/abstracts/variables" as *;
+
+.card {
+  border: 1px solid $border-color;
+  background: $color-surface;
+  padding: $spacing-6;
+  border-radius: $radius-xl;
+}
+
+.card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.card__description {
+  margin-top: $spacing-1;
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.card__list {
+  margin-top: $spacing-6;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.card__item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.card__content {
+  flex: 1;
+}
+
+.card__header {
+  margin-bottom: $spacing-1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card__name {
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.card__value {
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.card__bar {
+  height: 12px;
+  border-radius: $radius-sm;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.card__barFill {
+  height: 100%;
+  border-radius: $radius-sm;
+  transition: width 0.3s ease;
+}

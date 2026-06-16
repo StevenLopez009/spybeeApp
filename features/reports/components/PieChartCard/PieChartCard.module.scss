@@ -1,0 +1,23 @@
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.title {
+  margin-bottom: 1rem;
+  color: #000;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.chartContainer {
+  height: 250px;
+}
+
+@media (min-width: 640px) {
+  .chartContainer {
+    height: 300px;
+  }
+}

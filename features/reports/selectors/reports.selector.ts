@@ -62,3 +62,87 @@ export function getProcessedData(incidents: Incident[], dateRange: any) {
     ],
   };
 }
+
+export function getTopReporters(incidents: Incident[]) {
+  const grouped = incidents.reduce(
+    (acc, incident) => {
+      const owner = incident.owner;
+
+      if (!owner) return acc;
+
+      if (!acc[owner.id]) {
+        acc[owner.id] = {
+          id: owner.id,
+          name: owner.name,
+          avatar: owner.avatarUrl,
+          value: 0,
+        };
+      }
+
+      acc[owner.id].value++;
+
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
+
+  return Object.values(grouped)
+    .sort((a: any, b: any) => b.value - a.value)
+    .slice(0, 5);
+}
+
+export function getTopResolvers(incidents: Incident[]) {
+  const grouped = incidents
+    .filter((i) => i.status === "closed")
+    .reduce(
+      (acc, incident) => {
+        incident.assignees?.forEach((assignee) => {
+          if (!acc[assignee.id]) {
+            acc[assignee.id] = {
+              id: assignee.id,
+              name: assignee.name,
+              avatar: assignee.avatarUrl,
+              value: 0,
+            };
+          }
+
+          acc[assignee.id].value++;
+        });
+
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+
+  return Object.values(grouped)
+    .sort((a: any, b: any) => b.value - a.value)
+    .slice(0, 5);
+}
+
+export function getCurrentWorkload(incidents: Incident[]) {
+  const grouped = incidents
+    .filter((i) => i.status !== "closed")
+    .reduce(
+      (acc, incident) => {
+        incident.assignees?.forEach((assignee) => {
+          if (!acc[assignee.id]) {
+            acc[assignee.id] = {
+              id: assignee.id,
+              name: assignee.name,
+              avatar: assignee.avatarUrl,
+              value: 0,
+            };
+          }
+
+          acc[assignee.id].value++;
+        });
+
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+
+  return Object.values(grouped)
+    .sort((a: any, b: any) => b.value - a.value)
+    .slice(0, 5);
+}

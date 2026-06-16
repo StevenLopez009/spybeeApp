@@ -1,0 +1,107 @@
+@use "@/styles/abstracts/variables" as *;
+
+.page {
+  padding: $spacing-6;
+}
+
+.title {
+  margin-bottom: $spacing-6;
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+/* filtros */
+.filters {
+  margin-bottom: $spacing-4;
+  display: flex;
+  gap: $spacing-3;
+  align-items: center;
+}
+
+/* métricas */
+.metrics {
+  margin-top: $spacing-6;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: $spacing-4;
+}
+
+@media (max-width: 1280px) {
+  .metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* charts pie */
+.pieSection {
+  margin-top: $spacing-6;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-6;
+}
+
+@media (max-width: 1024px) {
+  .pieSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* trend */
+.trend {
+  margin-top: $spacing-6;
+}
+
+/* table */
+.table {
+  margin-top: $spacing-6;
+}
+
+/* map + calendar */
+.mapCalendar {
+  margin-top: $spacing-6;
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: $spacing-6;
+}
+
+@media (max-width: 1024px) {
+  .mapCalendar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* radar */
+.radar {
+  margin-top: $spacing-6;
+}
+
+/* team section */
+.teamSection {
+  margin-top: $spacing-8;
+}
+
+.teamTitle {
+  margin-bottom: $spacing-4;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+}
+
+@media (max-width: 1024px) {
+  .teamGrid {
+    grid-template-columns: 1fr;
+  }
+}

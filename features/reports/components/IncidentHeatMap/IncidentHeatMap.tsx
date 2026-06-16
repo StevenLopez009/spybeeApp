@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import styles from "./IncidentHeatMap.module.scss";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -52,7 +53,6 @@ export default function IncidentHeatMap({ incidents }: Props) {
     [incidents],
   );
 
-  // Crear mapa una sola vez
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
@@ -115,12 +115,9 @@ export default function IncidentHeatMap({ incidents }: Props) {
           "circle-stroke-color": "#FFFFFF",
         },
       });
-
       const source = map.getSource("incidents") as mapboxgl.GeoJSONSource;
-
       source.setData(geojson);
 
-      // fuerza recalculo del canvas
       setTimeout(() => {
         map.resize();
       }, 100);
@@ -135,14 +132,10 @@ export default function IncidentHeatMap({ incidents }: Props) {
   // Actualizar datos cuando cambien las incidencias
   useEffect(() => {
     const map = mapRef.current;
-
     if (!map) return;
-
     const updateData = () => {
       const source = map.getSource("incidents");
-
       if (!source) return;
-
       (source as mapboxgl.GeoJSONSource).setData(geojson);
     };
 
@@ -154,15 +147,10 @@ export default function IncidentHeatMap({ incidents }: Props) {
   }, [geojson]);
 
   return (
-    <div className="rounded-xl border bg-white p-4">
-      <h3 className="mb-4 text-lg font-semibold">
-        Mapa de calor de incidencias
-      </h3>
+    <div className={styles.card}>
+      <h3 className={styles.title}>Mapa de calor de incidencias</h3>
 
-      <div
-        ref={mapContainer}
-        className="h-[600px] w-full rounded-lg overflow-hidden"
-      />
+      <div ref={mapContainer} className={styles.mapContainer} />
     </div>
   );
 }

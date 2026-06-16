@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import styles from "./IncidentsTable.module.scss";
 
 interface Incident {
   id: string;
@@ -29,7 +30,7 @@ const priorityMap: Record<string, { label: string; color: string }> = {
 const statusMap: Record<string, { label: string; color: string }> = {
   open: { label: "Abierta", color: "bg-green-100 text-green-700" },
   closed: { label: "Cerrada", color: "bg-gray-100 text-gray-700" },
-  paused: { label: "Pausada", color: "bg-blue-100 text-blue-700" },
+  on_pause: { label: "Pausada", color: "bg-blue-100 text-blue-700" },
 };
 
 function formatDueDate(dueDate: string | null): string {
@@ -60,37 +61,40 @@ export default function IncidentsTable({
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
+
+  const getVisiblePages = () => {
+    const pages = [];
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, start + 2);
+
+    if (end - start < 2) {
+      start = Math.max(1, end - 2);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
   return (
-    <div className="p-6">
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead className={styles.head}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Título
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Prioridad
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Asignados
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Creado por
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vencimiento
-                </th>
+                <th className={styles.th}>ID</th>
+                <th className={styles.th}>Título</th>
+                <th className={styles.th}>Prioridad</th>
+                <th className={styles.th}>Estado</th>
+                <th className={styles.th}>Asignados</th>
+                <th className={styles.th}>Creado por</th>
+                <th className={styles.th}>Vencimiento</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={styles.tbody}>
               {paginatedIncidents.map((incident) => {
                 const prio = priorityMap[incident.priority?.toLowerCase()] || {
                   label: incident.priority || "—",
@@ -102,82 +106,87 @@ export default function IncidentsTable({
                 };
 
                 return (
-                  <tr key={incident.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={incident.id} className={styles.row}>
+                    <td className={`${styles.td} ${styles.id}`}>
                       #{incident.sequenceId?.padStart(4, "0")}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 font-medium">
-                        {incident.title}
-                      </div>
+
+                    <td className={styles.td}>
+                      <div className={styles.title}>{incident.title}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    <td className={styles.td}>
                       <span
-                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${prio.color}`}
+                        className={`${styles.badge} ${
+                          styles[incident.priority?.toLowerCase()] ??
+                          styles.defaultBadge
+                        }`}
                       >
                         {prio.label}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    <td className={styles.td}>
                       <span
-                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${stat.color}`}
+                        className={`${styles.badge} ${
+                          styles[incident.status?.toLowerCase()] ??
+                          styles.defaultBadge
+                        }`}
                       >
                         {stat.label}
                       </span>
                     </td>
 
-                    {/* Asignados */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex -space-x-2">
+                    <td className={styles.td}>
+                      <div className={styles.assignees}>
                         {incident.assignees
                           ?.slice(0, 3)
                           .map((assignee, idx) => (
                             <Image
                               key={idx}
-                              className="w-7 h-7 rounded-full border-2 border-white object-cover"
+                              className={styles.avatar}
                               src={assignee.avatarUrl}
                               alt={assignee.name}
                               width={28}
                               height={28}
                             />
                           ))}
+
                         {incident.assignees?.length > 3 && (
-                          <div className="w-7 h-7 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
+                          <div className={styles.avatarCounter}>
                             +{incident.assignees.length - 3}
                           </div>
                         )}
                       </div>
                     </td>
 
-                    {/* Creado por */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                    <td className={styles.td}>
+                      <div className={styles.owner}>
                         {incident.owner?.avatarUrl ? (
                           <Image
-                            className="w-7 h-7 rounded-full object-cover"
+                            className={styles.avatar}
                             src={incident.owner.avatarUrl}
                             alt={incident.owner.name || "Propietario"}
                             width={28}
                             height={28}
                           />
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                            👤
-                          </div>
+                          <div className={styles.ownerFallback}>👤</div>
                         )}
-                        <span className="text-sm text-gray-700 truncate max-w-[140px]">
+
+                        <span className={styles.ownerName}>
                           {incident.owner?.name || "Sin propietario"}
                         </span>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className={styles.td}>
                       <span
-                        className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                        className={`${styles.badge} ${
                           incident.dueDate &&
                           new Date(incident.dueDate) < new Date()
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-700"
+                            ? styles.overdue
+                            : styles.defaultBadge
                         }`}
                       >
                         {formatDueDate(incident.dueDate)}
@@ -195,35 +204,37 @@ export default function IncidentsTable({
               {incidents.length} incidencias
             </span>
 
-            <div className="flex gap-2">
+            <div className={styles.pagination}>
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className={styles.paginationButton}
               >
-                Anterior
+                ←
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === i + 1 ? "bg-blue-600 text-white" : "border"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
+              <div className={styles.pages}>
+                {getVisiblePages().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`${styles.pageButton} ${
+                      currentPage === page ? styles.active : ""
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
 
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className={styles.paginationButton}
               >
-                Siguiente
+                →
               </button>
             </div>
           </div>
