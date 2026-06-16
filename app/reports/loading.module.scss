@@ -1,0 +1,156 @@
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.page {
+  padding: 24px;
+}
+
+// Bloque "skeleton" reutilizable
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border-radius: 12px;
+  background: #e5e7eb;
+}
+
+// Marco de tarjeta blanca con skeleton dentro
+.card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 16px;
+  height: 100%;
+}
+
+.cardInner {
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  margin-bottom: 24px;
+  height: 32px;
+  width: 192px;
+}
+
+.filters {
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.filterBtn {
+  height: 36px;
+  width: 128px;
+}
+
+.rangePicker {
+  height: 36px;
+  width: 256px;
+}
+
+.metrics {
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.metricCard {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 16px;
+}
+
+.metricLabel {
+  margin-bottom: 8px;
+  height: 12px;
+  width: 66%;
+}
+
+.metricValue {
+  height: 28px;
+  width: 50%;
+}
+
+.pies {
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pieBox {
+  height: 288px;
+}
+
+.trend {
+  margin-bottom: 24px;
+  height: 384px;
+}
+
+.table {
+  margin-bottom: 24px;
+  height: 256px;
+}
+
+.mapCalendar {
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 8fr 4fr;
+  }
+}
+
+.mapCalendarBox {
+  height: 400px;
+}
+
+.radar {
+  margin-bottom: 32px;
+  height: 384px;
+}
+
+.teamTitle {
+  margin-bottom: 16px;
+  height: 24px;
+  width: 224px;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.teamBox {
+  height: 256px;
+}

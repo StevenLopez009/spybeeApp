@@ -35,7 +35,7 @@ export default function DashboardFilters() {
 
   const clearFilters = () => {
     setFilters({
-      period: "90d",
+      period: "all",
       createdBy: null,
       assignedTo: null,
     });
@@ -66,6 +66,10 @@ export default function DashboardFilters() {
               value={filters.period}
               onChange={(value) => setFilters({ period: value })}
               options={[
+                {
+                  value: "all",
+                  label: "Todo el tiempo",
+                },
                 {
                   value: "7d",
                   label: "Últimos 7 días",

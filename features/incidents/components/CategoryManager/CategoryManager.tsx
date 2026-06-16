@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./CategoryManager.module.scss";
 
 interface CategoryManagerProps {
   categories: string[];
@@ -39,13 +40,10 @@ export default function CategoryManager({
   };
 
   return (
-    <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
-      <ul className="space-y-1">
+    <div className={styles.manager}>
+      <ul className={styles.list}>
         {categories.map((cat) => (
-          <li
-            key={cat}
-            className="flex items-center gap-2 rounded bg-white px-2 py-1 border border-gray-200"
-          >
+          <li key={cat} className={styles.item}>
             {editing === cat ? (
               <input
                 autoFocus
@@ -58,17 +56,17 @@ export default function CategoryManager({
                   }
                   if (e.key === "Escape") setEditing(null);
                 }}
-                className="flex-1 px-2 py-1 text-sm border border-amber-300 rounded focus:ring-2 focus:ring-amber-400 focus:outline-none text-black"
+                className={styles.editInput}
               />
             ) : (
-              <span className="flex-1 text-sm text-gray-700">{cat}</span>
+              <span className={styles.name}>{cat}</span>
             )}
 
             {editing === cat ? (
               <button
                 type="button"
                 onClick={commitEdit}
-                className="text-xs font-medium text-green-600 hover:text-green-800"
+                className={styles.saveBtn}
               >
                 Guardar
               </button>
@@ -76,7 +74,7 @@ export default function CategoryManager({
               <button
                 type="button"
                 onClick={() => startEdit(cat)}
-                className="text-xs font-medium text-amber-600 hover:text-amber-700"
+                className={styles.editBtn}
               >
                 Editar
               </button>
@@ -84,20 +82,18 @@ export default function CategoryManager({
             <button
               type="button"
               onClick={() => onRemove(cat)}
-              className="text-xs font-medium text-red-500 hover:text-red-700"
+              className={styles.removeBtn}
             >
               Eliminar
             </button>
           </li>
         ))}
         {categories.length === 0 && (
-          <li className="text-xs text-gray-400 px-2 py-1">
-            No hay categorías. Agrega una abajo.
-          </li>
+          <li className={styles.empty}>No hay categorías. Agrega una abajo.</li>
         )}
       </ul>
 
-      <div className="mt-2 flex gap-2">
+      <div className={styles.addRow}>
         <input
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
@@ -108,13 +104,9 @@ export default function CategoryManager({
             }
           }}
           placeholder="Nueva categoría"
-          className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-400 focus:outline-none text-black"
+          className={styles.addInput}
         />
-        <button
-          type="button"
-          onClick={handleAdd}
-          className="px-3 py-1.5 text-sm font-medium bg-amber-400 text-white rounded hover:bg-amber-500"
-        >
+        <button type="button" onClick={handleAdd} className={styles.addBtn}>
           Agregar
         </button>
       </div>

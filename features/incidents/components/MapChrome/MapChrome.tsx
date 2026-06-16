@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import styles from "./MapChrome.module.scss";
 
 interface MapChromeProps {
   is3D: boolean;
@@ -11,9 +12,10 @@ interface MapChromeProps {
   onShowDetails: () => void;
   canShowDetails: boolean;
   onCreateIncident: () => void;
+  /** Solo se puede crear cuando hay una ubicación marcada en el mapa. */
+  canCreate: boolean;
 }
 
-/* ----- helpers de iconos (outline tipo Lucide) ----- */
 function Svg({ children, size = 20 }: { children: ReactNode; size?: number }) {
   return (
     <svg
@@ -125,30 +127,49 @@ const I = {
   triangle: <path d="M12 3 2 21h20L12 3Z" />,
 };
 
-function ToolBtn({
-  children,
-  active,
-  className = "",
-  title,
-  onClick,
+function CreateButton({
+  canCreate,
+  onCreate,
+  reason,
 }: {
-  children: ReactNode;
-  active?: boolean;
-  className?: string;
-  title?: string;
-  onClick?: () => void;
+  canCreate: boolean;
+  onCreate: () => void;
+  reason: string;
 }) {
+  const [showTip, setShowTip] = useState(false);
+
+  // Autoocultar el tooltip
+  useEffect(() => {
+    if (!showTip) return;
+    const id = window.setTimeout(() => setShowTip(false), 2500);
+    return () => window.clearTimeout(id);
+  }, [showTip]);
+
   return (
-    <button
-      type="button"
-      title={title}
-      onClick={onClick}
-      className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
-        active ? "bg-amber-400 text-white" : "text-gray-600 hover:bg-gray-100"
-      } ${className}`}
+    <span
+      className={styles.createWrap}
+      onMouseEnter={() => !canCreate && setShowTip(true)}
+      onMouseLeave={() => setShowTip(false)}
     >
-      {children}
-    </button>
+      <button
+        type="button"
+        aria-disabled={!canCreate}
+        aria-label="Crear incidencia"
+        title={canCreate ? "Crear incidencia" : undefined}
+        onClick={() => (canCreate ? onCreate() : setShowTip(true))}
+        className={`${styles.createBtn} ${
+          canCreate ? styles.createBtnEnabled : styles.createBtnDisabled
+        }`}
+      >
+        <Svg>{I.plus}</Svg>
+      </button>
+
+      {!canCreate && showTip && (
+        <span role="tooltip" className={styles.tooltip}>
+          {reason}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -161,7 +182,10 @@ export default function MapChrome({
   onShowDetails,
   canShowDetails,
   onCreateIncident,
+  canCreate,
 }: MapChromeProps) {
+  const createReason = "Marca primero una ubicación en el mapa";
+
   return (
     <>
       {/* Top-left: Ver detalles */}
@@ -174,85 +198,48 @@ export default function MapChrome({
             ? "Ver información de la incidencia"
             : "Crea o selecciona una incidencia primero"
         }
-        className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-md transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className={styles.detailsBtn}
       >
         Ver detalles
         <Svg size={18}>{I.panel}</Svg>
       </button>
 
       {/* Top-center: filtro + fecha + visitas */}
-      <div className="absolute left-1/2 top-4 z-10 hidden -translate-x-1/2 items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-md lg:flex">
-        <button
-          type="button"
-          className="text-gray-500 hover:text-gray-700"
-          title="Filtros"
-        >
+      <div className={styles.topBar}>
+        <button type="button" className={styles.iconBtn} title="Filtros">
           <Svg>{I.filter}</Svg>
         </button>
-        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700">
+        <div className={styles.dateBox}>
           02 jun 2026
           <Svg size={16}>{I.chevronDown}</Svg>
         </div>
-        <span className="text-sm font-medium text-gray-700">
-          Últimas 5 visitas
-        </span>
-        <div className="flex items-center gap-1.5">
+        <span className={styles.topLabel}>Últimas 5 visitas</span>
+        <div className={styles.dots}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <span
-              key={i}
-              className={`h-3 w-3 rounded-full ${
-                i === 4 ? "bg-white ring-2 ring-amber-400" : "bg-amber-400"
-              }`}
-            />
+            <span key={i} className={i === 4 ? styles.dotActive : styles.dot} />
           ))}
         </div>
-        <button
-          type="button"
-          className="text-gray-500 hover:text-gray-700"
-          title="Añadir"
-        >
+        <button type="button" className={styles.iconBtn} title="Añadir">
           <Svg size={18}>{I.plus}</Svg>
         </button>
       </div>
 
-      {/* Right: barra de herramientas vertical */}
-      <div className="absolute right-3 top-3 z-10 hidden flex-col items-center gap-1 rounded-2xl bg-white p-1.5 shadow-md md:flex">
-        <ToolBtn active title="Crear" onClick={onCreateIncident}>
-          <Svg>{I.plus}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Documentos">
-          <Svg>{I.book}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Favoritos">
-          <Svg>{I.folderStar}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Ubicaciones">
-          <Svg>{I.pin}</Svg>
-        </ToolBtn>
-        <div className="my-1 h-px w-6 bg-gray-200" />
-        <ToolBtn title="Capas">
-          <Svg>{I.layers}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Imágenes">
-          <Svg>{I.image}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Anotaciones">
-          <Svg>{I.brush}</Svg>
-        </ToolBtn>
-        <ToolBtn title="Compartir">
-          <Svg>{I.share}</Svg>
-        </ToolBtn>
+      {/* Right: botón Crear (desktop) */}
+      <div className={styles.toolbar}>
+        <CreateButton
+          canCreate={canCreate}
+          onCreate={onCreateIncident}
+          reason={createReason}
+        />
       </div>
 
       {/* Bottom-center: 2D/3D + 360° */}
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-xl bg-white p-1 shadow-md">
+      <div className={styles.viewBar}>
         <button
           type="button"
           onClick={() => onSet3D(false)}
-          className={`rounded-lg px-4 py-1.5 text-sm font-bold transition ${
-            !is3D
-              ? "bg-amber-400 text-white"
-              : "text-gray-600 hover:bg-gray-100"
+          className={`${styles.viewBtn} ${
+            !is3D ? styles.viewBtnActive : styles.viewBtnInactive
           }`}
         >
           2D
@@ -260,13 +247,13 @@ export default function MapChrome({
         <button
           type="button"
           onClick={() => onSet3D(true)}
-          className={`rounded-lg px-4 py-1.5 text-sm font-bold transition ${
-            is3D ? "bg-amber-400 text-white" : "text-gray-600 hover:bg-gray-100"
+          className={`${styles.viewBtn} ${
+            is3D ? styles.viewBtnActive : styles.viewBtnInactive
           }`}
         >
           3D
         </button>
-        <div className="mx-1 hidden h-5 w-px bg-gray-200 sm:block" />
+        <div className={styles.viewSep} />
 
         <button
           type="button"
@@ -277,32 +264,32 @@ export default function MapChrome({
               ? "Vista 360° de la incidencia"
               : "Crea o selecciona una incidencia primero"
           }
-          className="ml-1 hidden items-center gap-2 pr-2 transition disabled:cursor-not-allowed disabled:opacity-50 sm:flex"
+          className={styles.toggle360}
         >
           <span
-            className={`text-sm font-semibold ${
-              is360 ? "text-amber-500" : "text-gray-700"
-            }`}
+            className={is360 ? styles.toggleLabelActive : styles.toggleLabel}
           >
             360°
           </span>
           <span
-            className={`flex h-5 w-9 items-center rounded-full px-0.5 transition-colors ${
-              is360 ? "bg-amber-400" : "bg-gray-200"
-            }`}
+            className={`${styles.switch} ${is360 ? styles.switchActive : ""}`}
           >
             <span
-              className={`h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                is360 ? "translate-x-4" : ""
-              }`}
+              className={`${styles.knob} ${is360 ? styles.knobActive : ""}`}
             />
           </span>
         </button>
       </div>
 
       {/* Bottom-right: logo */}
-      <div className="absolute bottom-3 right-4 z-10 select-none text-xl font-extrabold tracking-tight text-gray-400">
-        Spybee
+      <div className={styles.logo}>Spybee</div>
+
+      <div className={styles.mobileCreate}>
+        <CreateButton
+          canCreate={canCreate}
+          onCreate={onCreateIncident}
+          reason={createReason}
+        />
       </div>
     </>
   );

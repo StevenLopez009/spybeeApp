@@ -1,1 +1,1 @@
-export * from './IncidentMap';
+export * from "./IncidentMap";

@@ -1,10 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { IncidentData, Assignee, PRIORITIES, DEFAULT_LEVELS } from "../types";
+import {
+  IncidentData,
+  Assignee,
+  PRIORITIES,
+  DEFAULT_LEVELS,
+} from "../../types";
 
-import { useCategories } from "../hooks/useCategories";
-import CategoryManager from "./CategoryManager";
+import styles from "./IncidentForm.module.scss";
+import { useCategories } from "../../hooks/useCategories";
+import CategoryManager from "../CategoryManager/CategoryManager";
 
 interface IncidentFormProps {
   coordinates: {
@@ -15,6 +21,13 @@ interface IncidentFormProps {
   onClose: () => void;
   onSubmit: (data: IncidentData) => void;
 }
+
+const PRIORITY_CLASS: Record<string, string> = {
+  Urgente: styles.priorityUrgente,
+  Alta: styles.priorityAlta,
+  Media: styles.priorityMedia,
+  Baja: styles.priorityBaja,
+};
 
 export default function IncidentForm({
   coordinates,
@@ -40,12 +53,8 @@ export default function IncidentForm({
   });
 
   const [managingCategories, setManagingCategories] = useState(false);
-
-  // Niveles disponibles = los por defecto + los personalizados que se vayan agregando
   const [levels, setLevels] = useState<string[]>([...DEFAULT_LEVELS]);
   const [newLevel, setNewLevel] = useState("");
-
-  // Borrador del asignado que se está agregando
   const [assigneeDraft, setAssigneeDraft] = useState<Assignee>({
     name: "",
     role: "",
@@ -93,7 +102,6 @@ export default function IncidentForm({
       return {
         ...prev,
         assignees: prev.assignees.filter((_, i) => i !== index),
-        // Si el observador era el asignado eliminado, lo limpiamos
         observer: prev.observer === removed?.name ? "" : prev.observer,
       };
     });
@@ -105,46 +113,40 @@ export default function IncidentForm({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">Nueva Incidencia</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-          >
+    <div className={styles.overlay}>
+      <div className={styles.panel}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Nueva Incidencia</h2>
+          <button onClick={onClose} className={styles.closeButton}>
             ×
           </button>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="p-4 sm:p-6 space-y-5 sm:space-y-6"
-        >
+        <form onSubmit={handleSubmit} className={styles.form}>
           {/* Ubicación */}
-          <div className="bg-amber-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-700 mb-2">📍 Ubicación</h3>
-            <p className="text-sm text-gray-600">
+          <div className={styles.locationBox}>
+            <h3 className={styles.locationHeading}>📍 Ubicación</h3>
+            <p className={styles.locationAddress}>
               {address || "Cargando dirección..."}
             </p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <div className="rounded bg-white px-3 py-2 border border-amber-100">
-                <span className="block text-xs text-gray-400">Latitud</span>
-                <span className="text-sm font-mono text-gray-700">
+            <div className={styles.coordGrid}>
+              <div className={styles.coordCell}>
+                <span className={styles.coordLabel}>Latitud</span>
+                <span className={styles.coordValue}>
                   {coordinates.lat.toFixed(6)}
                 </span>
               </div>
-              <div className="rounded bg-white px-3 py-2 border border-amber-100">
-                <span className="block text-xs text-gray-400">Longitud</span>
-                <span className="text-sm font-mono text-gray-700">
+              <div className={styles.coordCell}>
+                <span className={styles.coordLabel}>Longitud</span>
+                <span className={styles.coordValue}>
                   {coordinates.lng.toFixed(6)}
                 </span>
               </div>
             </div>
 
             {/* Detalles de la localización */}
-            <div className="mt-3">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className={styles.locationDetailsWrap}>
+              <label className={styles.labelTight}>
                 Detalles de la localización
               </label>
               <textarea
@@ -154,16 +156,14 @@ export default function IncidentForm({
                 }
                 placeholder="Ej: junto a la recepción, pasillo norte, frente al ascensor..."
                 rows={2}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black resize-none"
+                className={`${styles.field} ${styles.textarea}`}
               />
             </div>
           </div>
 
           {/* Título */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Título de la incidencia *
-            </label>
+            <label className={styles.label}>Título de la incidencia *</label>
             <input
               type="text"
               required
@@ -172,20 +172,20 @@ export default function IncidentForm({
                 setFormData({ ...formData, title: e.target.value })
               }
               placeholder="Ej: Bache en la calzada"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black"
+              className={styles.field}
             />
           </div>
 
           {/* Categoría + gestión */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">
+            <div className={styles.categoryHeader}>
+              <label className={styles.label} style={{ marginBottom: 0 }}>
                 Categoría *
               </label>
               <button
                 type="button"
                 onClick={() => setManagingCategories((v) => !v)}
-                className="text-xs font-medium text-amber-600 hover:text-amber-700"
+                className={styles.manageButton}
               >
                 {managingCategories
                   ? "Cerrar gestión"
@@ -198,7 +198,7 @@ export default function IncidentForm({
               onChange={(e) =>
                 setFormData({ ...formData, category: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black"
+              className={`${styles.field} ${styles.select}`}
             >
               <option value="">Seleccionar categoría</option>
               {categories.map((cat) => (
@@ -220,54 +220,45 @@ export default function IncidentForm({
 
           {/* Prioridad */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Prioridad
-            </label>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
-              {PRIORITIES.map((priority) => (
-                <button
-                  key={priority}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, priority })}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-                    formData.priority === priority
-                      ? priority === "Urgente"
-                        ? "bg-red-500 text-white"
-                        : priority === "Alta"
-                          ? "bg-orange-500 text-white"
-                          : priority === "Media"
-                            ? "bg-yellow-500 text-white"
-                            : "bg-green-500 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {priority}
-                </button>
-              ))}
+            <label className={styles.label}>Prioridad</label>
+            <div className={styles.priorityGroup}>
+              {PRIORITIES.map((priority) => {
+                const selected = formData.priority === priority;
+                return (
+                  <button
+                    key={priority}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, priority })}
+                    className={`${styles.priorityButton} ${
+                      selected
+                        ? `${styles.prioritySelected} ${PRIORITY_CLASS[priority]}`
+                        : ""
+                    }`}
+                  >
+                    {priority}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Fecha de vencimiento */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fecha de vencimiento
-            </label>
+            <label className={styles.label}>Fecha de vencimiento</label>
             <input
               type="date"
               value={formData.dueDate}
               onChange={(e) =>
                 setFormData({ ...formData, dueDate: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black"
+              className={styles.field}
             />
           </div>
 
           {/* Etiquetas: pisos / niveles */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Piso / Nivel (etiquetas)
-            </label>
-            <div className="flex flex-wrap gap-2">
+            <label className={styles.label}>Piso / Nivel (etiquetas)</label>
+            <div className={styles.tagList}>
               {levels.map((level) => {
                 const selected = formData.tags.includes(level);
                 return (
@@ -275,10 +266,8 @@ export default function IncidentForm({
                     key={level}
                     type="button"
                     onClick={() => toggleTag(level)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition ${
-                      selected
-                        ? "bg-amber-400 text-white border-amber-400"
-                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                    className={`${styles.tagButton} ${
+                      selected ? styles.tagButtonSelected : ""
                     }`}
                   >
                     {level}
@@ -286,7 +275,7 @@ export default function IncidentForm({
                 );
               })}
             </div>
-            <div className="mt-2 flex gap-2">
+            <div className={styles.addLevelRow}>
               <input
                 value={newLevel}
                 onChange={(e) => setNewLevel(e.target.value)}
@@ -297,12 +286,12 @@ export default function IncidentForm({
                   }
                 }}
                 placeholder="Agregar otro nivel (ej: Mezzanine)"
-                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-400 focus:outline-none text-black"
+                className={styles.smallField}
               />
               <button
                 type="button"
                 onClick={addLevel}
-                className="px-3 py-1.5 text-sm font-medium bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                className={styles.grayButton}
               >
                 Añadir
               </button>
@@ -311,25 +300,20 @@ export default function IncidentForm({
 
           {/* Asignados */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Asignados
-            </label>
+            <label className={styles.label}>Asignados</label>
 
             {formData.assignees.length > 0 && (
-              <ul className="mb-2 space-y-1">
+              <ul className={styles.assigneeList}>
                 {formData.assignees.map((a, i) => (
-                  <li
-                    key={`${a.name}-${i}`}
-                    className="flex items-center justify-between rounded bg-gray-50 px-3 py-2 border border-gray-200"
-                  >
-                    <span className="text-sm text-gray-700">
-                      <span className="font-medium">{a.name}</span>
-                      <span className="text-gray-500"> — {a.role}</span>
+                  <li key={`${a.name}-${i}`} className={styles.assigneeItem}>
+                    <span className={styles.assigneeText}>
+                      <span className={styles.assigneeName}>{a.name}</span>
+                      <span className={styles.assigneeRole}> — {a.role}</span>
                     </span>
                     <button
                       type="button"
                       onClick={() => removeAssignee(i)}
-                      className="text-xs font-medium text-red-500 hover:text-red-700"
+                      className={styles.removeButton}
                     >
                       Eliminar
                     </button>
@@ -338,14 +322,14 @@ export default function IncidentForm({
               </ul>
             )}
 
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className={styles.assigneeForm}>
               <input
                 value={assigneeDraft.name}
                 onChange={(e) =>
                   setAssigneeDraft({ ...assigneeDraft, name: e.target.value })
                 }
                 placeholder="Nombre"
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-400 focus:outline-none text-black"
+                className={styles.assigneeField}
               />
               <input
                 value={assigneeDraft.role}
@@ -359,12 +343,12 @@ export default function IncidentForm({
                   }
                 }}
                 placeholder="Cargo"
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-400 focus:outline-none text-black"
+                className={styles.assigneeField}
               />
               <button
                 type="button"
                 onClick={addAssignee}
-                className="px-4 py-2 text-sm font-medium bg-amber-400 text-white rounded hover:bg-amber-500"
+                className={styles.amberButton}
               >
                 Agregar
               </button>
@@ -373,16 +357,14 @@ export default function IncidentForm({
 
           {/* Observaciones: quién hace la observación */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Observación realizada por
-            </label>
+            <label className={styles.label}>Observación realizada por</label>
             <select
               value={formData.observer}
               onChange={(e) =>
                 setFormData({ ...formData, observer: e.target.value })
               }
               disabled={formData.assignees.length === 0}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black disabled:bg-gray-100 disabled:text-gray-400"
+              className={`${styles.field} ${styles.select}`}
             >
               <option value="">
                 {formData.assignees.length === 0
@@ -399,9 +381,7 @@ export default function IncidentForm({
 
           {/* Descripción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Descripción *
-            </label>
+            <label className={styles.label}>Descripción *</label>
             <textarea
               required
               value={formData.description}
@@ -410,15 +390,13 @@ export default function IncidentForm({
               }
               placeholder="Describe la incidencia con el mayor detalle posible..."
               rows={5}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black resize-none"
+              className={`${styles.field} ${styles.textarea}`}
             />
           </div>
 
           {/* Imágenes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Imágenes (opcional)
-            </label>
+            <label className={styles.label}>Imágenes (opcional)</label>
             <input
               type="file"
               accept="image/*"
@@ -432,9 +410,9 @@ export default function IncidentForm({
                   });
                 }
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent text-black"
+              className={styles.field}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className={styles.fileHint}>
               {formData.images?.length
                 ? `${formData.images.length} imagen(es) seleccionada(s)`
                 : "Puedes subir múltiples imágenes"}
@@ -442,18 +420,15 @@ export default function IncidentForm({
           </div>
 
           {/* Botones */}
-          <div className="flex gap-3 pt-4">
+          <div className={styles.footer}>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition"
+              className={styles.cancelButton}
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-amber-400 text-white rounded-lg font-medium hover:bg-amber-500 transition"
-            >
+            <button type="submit" className={styles.submitButton}>
               Crear Incidencia
             </button>
           </div>

@@ -197,8 +197,8 @@ export default function IncidentsTable({
               })}
             </tbody>
           </table>
-          <div className="flex items-center justify-between px-6 py-4 border-t">
-            <span className="text-sm text-gray-500">
+          <div className={styles.footer}>
+            <span className={styles.footerInfo}>
               Mostrando {(currentPage - 1) * ITEMS_PER_PAGE + 1} -
               {Math.min(currentPage * ITEMS_PER_PAGE, incidents.length)} de{" "}
               {incidents.length} incidencias

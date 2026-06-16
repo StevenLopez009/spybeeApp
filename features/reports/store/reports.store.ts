@@ -26,7 +26,7 @@ export const useReportsStore = create<ReportsState>((set) => ({
   selectedDate: undefined,
 
   filters: {
-    period: "90d",
+    period: "all",
     createdBy: null,
     assignedTo: null,
   },

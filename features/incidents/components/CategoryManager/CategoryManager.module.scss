@@ -1,0 +1,112 @@
+.manager {
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 12px;
+}
+
+.list {
+  & > * + * {
+    margin-top: 4px;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.editInput {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  color: #000;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #fbbf24;
+  }
+}
+
+.name {
+  flex: 1;
+  font-size: 14px;
+  color: #374151;
+}
+
+.saveBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: #16a34a;
+
+  &:hover {
+    color: #166534;
+  }
+}
+
+.editBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: #d97706;
+
+  &:hover {
+    color: #b45309;
+  }
+}
+
+.removeBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ef4444;
+
+  &:hover {
+    color: #b91c1c;
+  }
+}
+
+.empty {
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 4px 8px;
+}
+
+.addRow {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.addInput {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #000;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #fbbf24;
+  }
+}
+
+.addBtn {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fbbf24;
+  color: #fff;
+  border-radius: 4px;
+
+  &:hover {
+    background: #f59e0b;
+  }
+}

@@ -24,7 +24,11 @@ export default function PieChartCard({ title, data, colors }: Props) {
       <h3 className={styles.title}>{title}</h3>
 
       <div className={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          initialDimension={{ width: 400, height: 300 }}
+        >
           <PieChart>
             <Pie
               data={chartData}

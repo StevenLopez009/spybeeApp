@@ -1,19 +1,66 @@
-@use "./abstracts/variables";
-@use "./abstracts/mixins";
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
 
-* {
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #e7e7e7;
+    --foreground: #ededed;
+  }
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family:
-    Inter,
-    sans-serif;
-  background: #f8fafc;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  background: transparent;
+  background-image: none;
+  border: 0;
+  color: inherit;
+  text-transform: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }

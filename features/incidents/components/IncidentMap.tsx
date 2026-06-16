@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IncidentData } from "../types";
-import MapChrome from "./MapChrome";
-import IncidentForm from "./IncidentForm";
-import IncidentSidebar from "./IncidentSideBar";
+import MapChrome from "./MapChrome/MapChrome";
+import IncidentForm from "./IncidentForm/IncidentForm";
+
+import styles from "./IncidentMap.module.scss";
+import IncidentSidebar from "./InsidentSideBar/IncidentSideBar";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -18,7 +20,7 @@ interface SelectedLocation {
   address?: string;
 }
 
-export default function Map() {
+export default function IncidentMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
@@ -95,7 +97,6 @@ export default function Map() {
         duration: 800,
       });
     } else {
-      // Volver a 2D apaga la vista 360°
       is360Ref.current = false;
       setIs360(false);
       stopOrbit();
@@ -121,7 +122,6 @@ export default function Map() {
         pitch: 65,
         duration: 1200,
       });
-      // Arrancamos la órbita cuando termina el vuelo
       map.once("moveend", () => {
         if (is360Ref.current) startOrbit();
       });
@@ -143,6 +143,10 @@ export default function Map() {
     });
 
     mapRef.current = map;
+    map.on("load", () => map.resize());
+
+    const resizeObserver = new ResizeObserver(() => mapRef.current?.resize());
+    resizeObserver.observe(mapContainer.current);
 
     map.on("click", async (e) => {
       const { lng, lat } = e.lngLat;
@@ -183,6 +187,7 @@ export default function Map() {
 
     return () => {
       stopOrbit();
+      resizeObserver.disconnect();
       if (markerRef.current) {
         markerRef.current.remove();
       }
@@ -203,7 +208,6 @@ export default function Map() {
       const result = await response.json();
 
       if (result.success) {
-        // Coloca un icono permanente en la ubicación de la incidencia creada
         if (mapRef.current) {
           const el = document.createElement("div");
           el.textContent = "🚨";
@@ -211,7 +215,6 @@ export default function Map() {
           el.style.lineHeight = "1";
           el.style.cursor = "pointer";
           el.title = data.title;
-          // Al hacer clic en el icono se abre el sidebar con toda la información
           el.addEventListener("click", (ev) => {
             ev.stopPropagation();
             openIncident(data);
@@ -223,8 +226,6 @@ export default function Map() {
 
           incidentMarkersRef.current.push(incidentMarker);
         }
-
-        // Mostramos el detalle de inmediato tras crearla
         openIncident(data);
       } else {
         alert("❌ Error al crear la incidencia. Por favor intenta de nuevo.");
@@ -255,8 +256,8 @@ export default function Map() {
 
   return (
     <>
-      <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden sm:h-screen">
-        <div ref={mapContainer} className="h-full w-full" />
+      <div className={styles.mapWrapper}>
+        <div ref={mapContainer} className={styles.mapCanvas} />
 
         <MapChrome
           is3D={is3D}
@@ -268,12 +269,9 @@ export default function Map() {
             lastIncident && setSelectedIncident(lastIncident)
           }
           canShowDetails={!!lastIncident}
+          canCreate={!!selectedLocation}
           onCreateIncident={() => {
-            if (!selectedLocation) {
-              alert("Primero selecciona una ubicación en el mapa");
-              return;
-            }
-
+            if (!selectedLocation) return;
             setShowForm(true);
           }}
         />

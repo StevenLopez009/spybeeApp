@@ -1,0 +1,341 @@
+// Sombras equivalentes a las de Tailwind usadas en el chrome del mapa
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+
+/* ---------- ToolBtn ---------- */
+.toolBtn {
+  display: flex;
+  height: 36px;
+  width: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 150ms ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+.toolBtnActive {
+  background: #fbbf24;
+  color: #fff;
+}
+
+.toolBtnInactive {
+  color: #4b5563;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+/* ---------- CreateButton ---------- */
+.createWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.createBtn {
+  display: flex;
+  height: 36px;
+  width: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 150ms ease;
+}
+
+.createBtnEnabled {
+  background: #fbbf24;
+  color: #fff;
+}
+
+.createBtnDisabled {
+  cursor: not-allowed;
+  color: #9ca3af;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.tooltip {
+  pointer-events: none;
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  z-index: 30;
+  margin-right: 8px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  border-radius: 8px;
+  background: #111827;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: $shadow-lg;
+}
+
+/* ---------- Ver detalles ---------- */
+.detailsBtn {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  box-shadow: $shadow-md;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: #f9fafb;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* ---------- Barra superior central (filtros) ---------- */
+.topBar {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  z-index: 10;
+  display: none;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: 12px;
+  border-radius: 16px;
+  background: #fff;
+  padding: 8px 12px;
+  box-shadow: $shadow-md;
+
+  @media (min-width: 1024px) {
+    display: flex;
+  }
+}
+
+.iconBtn {
+  color: #6b7280;
+
+  &:hover {
+    color: #374151;
+  }
+}
+
+.dateBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.topLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: #fbbf24;
+}
+
+.dotActive {
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 0 0 2px #fbbf24;
+}
+
+/* ---------- Barra de herramientas vertical (derecha) ---------- */
+.toolbar {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-radius: 16px;
+  background: #fff;
+  padding: 6px;
+  box-shadow: $shadow-md;
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
+}
+
+.separator {
+  margin: 4px 0;
+  height: 1px;
+  width: 24px;
+  background: #e5e7eb;
+}
+
+/* ---------- Barra inferior (2D/3D + 360) ---------- */
+.viewBar {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: 4px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 4px;
+  box-shadow: $shadow-md;
+}
+
+.viewBtn {
+  border-radius: 8px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 150ms ease;
+}
+
+.viewBtnActive {
+  background: #fbbf24;
+  color: #fff;
+}
+
+.viewBtnInactive {
+  color: #4b5563;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.viewSep {
+  margin: 0 4px;
+  display: none;
+  height: 20px;
+  width: 1px;
+  background: #e5e7eb;
+
+  @media (min-width: 640px) {
+    display: block;
+  }
+}
+
+.toggle360 {
+  margin-left: 4px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding-right: 8px;
+  transition: all 150ms ease;
+
+  @media (min-width: 640px) {
+    display: flex;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.toggleLabelActive {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+.switch {
+  display: flex;
+  height: 20px;
+  width: 36px;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0 2px;
+  background: #e5e7eb;
+  transition: background-color 150ms ease;
+}
+
+.switchActive {
+  background: #fbbf24;
+}
+
+.knob {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: $shadow;
+  transition: transform 150ms ease;
+}
+
+.knobActive {
+  transform: translateX(16px);
+}
+
+/* ---------- Logo ---------- */
+.logo {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  z-index: 10;
+  user-select: none;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #9ca3af;
+}
+
+/* ---------- Botón Crear — solo móvil ---------- */
+.mobileCreate {
+  position: absolute;
+  bottom: 80px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  border-radius: 16px;
+  background: #fff;
+  padding: 6px;
+  box-shadow: $shadow-md;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}

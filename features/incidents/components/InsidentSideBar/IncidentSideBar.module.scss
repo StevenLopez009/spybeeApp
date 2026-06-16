@@ -1,0 +1,212 @@
+.aside {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  height: 100%;
+  width: 100%;
+  max-width: 440px;
+  overflow-y: auto;
+  border-left: 1px solid #e5e7eb;
+  background-color: #fff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transition: transform 300ms ease-out;
+}
+
+.asideOpen {
+  transform: translateX(0);
+}
+
+.asideClosed {
+  transform: translateX(100%);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #fff;
+  padding: 16px 20px;
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.closeButton {
+  font-size: 24px;
+  font-weight: 700;
+  color: #6b7280;
+
+  &:hover {
+    color: #374151;
+  }
+}
+
+.body {
+  padding: 20px;
+
+  & > * + * {
+    margin-top: 20px;
+  }
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.badge {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.badgeUrgente {
+  background-color: #ef4444;
+}
+
+.badgeAlta {
+  background-color: #f97316;
+}
+
+.badgeMedia {
+  background-color: #eab308;
+}
+
+.badgeBaja {
+  background-color: #22c55e;
+}
+
+.badgeDefault {
+  background-color: #9ca3af;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #9ca3af;
+}
+
+.fieldValue {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.description {
+  white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  border-radius: 9999px;
+  background-color: #fef3c7;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #b45309;
+}
+
+.assignees {
+  & > * + * {
+    margin-top: 4px;
+  }
+}
+
+.assigneeName {
+  font-weight: 500;
+}
+
+.assigneeRole {
+  color: #6b7280;
+}
+
+.locationBox {
+  border-radius: 8px;
+  background-color: #f9fafb;
+  padding: 12px;
+}
+
+.locationLabel {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #9ca3af;
+}
+
+.locationAddress {
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.locationDetails {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.coordGrid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.coordBox {
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.coordLabel {
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.coordValue {
+  font-family: monospace;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.image {
+  height: 80px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  object-fit: cover;
+}

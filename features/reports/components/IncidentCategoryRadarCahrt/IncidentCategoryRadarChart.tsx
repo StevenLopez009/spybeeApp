@@ -25,7 +25,11 @@ export default function IncidentCategoryRadarChart({ data }: Props) {
       <h3 className={styles.chart__title}>Por categoría de incidencia</h3>
 
       <div className={styles.chart__container}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          initialDimension={{ width: 500, height: 400 }}
+        >
           <RadarChart data={data}>
             <PolarGrid />
 

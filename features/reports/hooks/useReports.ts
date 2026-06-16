@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import { useReportsStore } from "../store/reports.store";
 import {
@@ -13,6 +13,23 @@ export function useReports() {
   const incidents = useReportsStore((state) => state.incidents);
   const dateRange = useReportsStore((state) => state.dateRange);
   const filters = useReportsStore((state) => state.filters);
+
+  const effectiveRange = useMemo<[Dayjs | null, Dayjs | null] | null>(() => {
+    if (dateRange?.[0] && dateRange?.[1]) return dateRange;
+
+    const days =
+      filters.period === "7d"
+        ? 7
+        : filters.period === "30d"
+          ? 30
+          : filters.period === "90d"
+            ? 90
+            : null;
+
+    if (!days) return null;
+
+    return [dayjs().subtract(days, "day").startOf("day"), dayjs().endOf("day")];
+  }, [dateRange, filters.period]);
 
   const processedData = useMemo(() => {
     const filteredIncidents = incidents.filter((incident) => {
@@ -28,8 +45,8 @@ export function useReports() {
       return ownerMatch && assigneeMatch;
     });
 
-    return getProcessedData(filteredIncidents, dateRange);
-  }, [incidents, dateRange, filters]);
+    return getProcessedData(filteredIncidents, effectiveRange);
+  }, [incidents, effectiveRange, filters.createdBy, filters.assignedTo]);
 
   const reportersData = useMemo(
     () => getTopReporters(processedData.filtered),
@@ -51,7 +68,7 @@ export function useReports() {
 
     if (!filtered.length) return [];
 
-    const [startDayjs, endDayjs] = dateRange || [null, null];
+    const [startDayjs, endDayjs] = effectiveRange || [null, null];
 
     const start =
       startDayjs ||
@@ -91,7 +108,7 @@ export function useReports() {
         backlog: Math.max(cumulativeBacklog, 0),
       };
     });
-  }, [incidents, processedData.filtered, dateRange]);
+  }, [incidents, processedData.filtered, effectiveRange]);
 
   const categoryData = useMemo(() => {
     const grouped = processedData.filtered.reduce(

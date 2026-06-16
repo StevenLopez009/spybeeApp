@@ -1,0 +1,23 @@
+.content {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding-bottom: 64px; 
+  transition: all 200ms ease;
+
+  @media (min-width: 640px) {
+    padding-bottom: 0;
+  }
+}
+
+.contentExpanded {
+  @media (min-width: 640px) {
+    margin-left: 224px;
+  }
+}
+
+.contentCollapsed {
+  @media (min-width: 640px) {
+    margin-left: 64px; 
+  }
+}

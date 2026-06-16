@@ -1,0 +1,232 @@
+
+/* ---------- Bottom nav (mobile) ---------- */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  height: 64px;
+  align-items: stretch;
+  justify-content: space-around;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+
+  // sm:hidden -> hidden at >= 640px
+  @media (min-width: 640px) {
+    display: none;
+  }
+}
+
+.bottomItem {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #6b7280;
+}
+
+.bottomItemActive {
+  color: #f59e0b;
+}
+
+.bottomLabel {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/* ---------- Left rail (tablet / desktop) ---------- */
+.rail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  display: none; // hidden below 640px
+  height: 100%;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  transition: all 200ms;
+
+  // sm:flex -> flex at >= 640px
+  @media (min-width: 640px) {
+    display: flex;
+  }
+}
+
+.railCollapsed {
+  width: 64px;
+}
+
+.railExpanded {
+  width: 224px;
+}
+
+/* ---------- Avatar + expand button ---------- */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.avatar {
+  display: flex;
+  height: 44px;
+  width: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #fcd34d, #f59e0b);
+  font-size: 1.125rem;
+}
+
+.accountName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.expandButton {
+  position: absolute;
+  right: -12px;
+  top: 4px;
+  display: flex;
+  height: 24px;
+  width: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #6b7280;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    color: #1f2937;
+  }
+}
+
+.expandIcon {
+  transition: transform 200ms;
+}
+
+.expandIconRotated {
+  transform: rotate(180deg);
+}
+
+.divider {
+  margin: 16px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ---------- Navigation list ---------- */
+.navList {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+// Bottom actions container
+.actions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* ---------- Nav item base + variants ---------- */
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  transition: all 200ms;
+}
+
+// expanded layout
+.itemExpanded {
+  gap: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+// collapsed layout
+.itemCollapsed {
+  height: 44px;
+  width: 44px;
+  justify-content: center;
+}
+
+// active state (with rail indicator)
+.itemActive {
+  background: #fffbeb;
+  color: #f59e0b;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background: #fbbf24;
+  }
+}
+
+// inactive / default state
+.itemInactive {
+  color: #6b7280;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+}
+
+// action button state (always inactive style)
+.itemAction {
+  color: #6b7280;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+}
+
+.itemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 500;
+}

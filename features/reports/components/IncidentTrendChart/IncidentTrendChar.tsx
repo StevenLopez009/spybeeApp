@@ -29,7 +29,11 @@ export default function IncidentTrendChart({ data }: Props) {
       <h3 className={styles.title}>Tendencia de Incidencias</h3>
 
       <div className={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          initialDimension={{ width: 600, height: 400 }}
+        >
           <ComposedChart
             data={data}
             margin={{

@@ -1,0 +1,15 @@
+.mapWrapper {
+  position: relative;
+  height: calc(100vh - 4rem); // descontamos la bottom-nav en móvil
+  width: 100%;
+  overflow: hidden;
+
+  @media (min-width: 640px) {
+    height: 100vh;
+  }
+}
+
+.mapCanvas {
+  height: 100%;
+  width: 100%;
+}
