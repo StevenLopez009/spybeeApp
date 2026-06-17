@@ -33,7 +33,7 @@ export default function TeamRankingCard({
       <div className={styles.card__list}>
         {items.map((item) => (
           <div key={item.id} className={styles.card__item}>
-            <img
+            <Image
               src={item.avatar || "/avatar-placeholder.png"}
               alt={item.name}
               className={styles.card__avatar}

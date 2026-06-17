@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Dayjs } from "dayjs";
-import { Incident } from "@/features/incidents/types/incidents";
+import type { Incident } from "@/features/incidents/types/incidents";
 
 interface ReportsFilters {
   period: string;

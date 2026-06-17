@@ -6,7 +6,7 @@ import { DatePicker } from "antd";
 import IncidentsTable from "./IncidentTable/IncidentsTable";
 import IncidentHeatMap from "./IncidentHeatMap/IncidentHeatMap";
 import ActivityCalendar from "./ActivityCalendar/ActivityCalendar";
-import { Incident } from "@/features/incidents/types/incidents";
+import type { Incident } from "@/features/incidents/types/incidents";
 import { useReportsStore } from "../store/reports.store";
 import IncidentTrendChart from "./IncidentTrendChart/IncidentTrendChar";
 import IncidentCategoryRadarChart from "./IncidentCategoryRadarCahrt/IncidentCategoryRadarChart";
@@ -15,6 +15,7 @@ import TeamRankingCard from "./TeamRankingCard/TeamRankingCard";
 import { useReports } from "../hooks/useReports";
 import MetricCard from "./MetricCard/MetricCard";
 import PieChartCard from "./PieChartCard/PieChartCard";
+import type { Dayjs } from "dayjs";
 
 import styles from "./ReportsClient.module.scss";
 
@@ -54,7 +55,9 @@ export default function ReportsClient({ incidents }: Props) {
         <RangePicker
           format="DD/MM/YYYY"
           value={dateRange}
-          onChange={(dates) => setDateRange(dates as [any, any] | null)}
+          onChange={(dates) =>
+            setDateRange(dates as [Dayjs | null, Dayjs | null] | null)
+          }
         />
       </div>
 

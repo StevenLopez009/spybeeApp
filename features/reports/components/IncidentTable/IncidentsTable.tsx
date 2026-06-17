@@ -3,23 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import styles from "./IncidentsTable.module.scss";
-
-interface Incident {
-  id: string;
-  sequenceId: string;
-  title: string;
-  priority: string;
-  status: string;
-  owner: {
-    name?: string;
-    avatarUrl?: string;
-  } | null;
-  assignees: Array<{
-    name: string;
-    avatarUrl: string;
-  }>;
-  dueDate: string | null;
-}
+import type { Incident } from "@/features/incidents/types/incidents";
 
 const priorityMap: Record<string, { label: string; color: string }> = {
   high: { label: "Alta", color: "bg-red-100 text-red-700" },
@@ -33,7 +17,11 @@ const statusMap: Record<string, { label: string; color: string }> = {
   on_pause: { label: "Pausada", color: "bg-blue-100 text-blue-700" },
 };
 
-function formatDueDate(dueDate: string | null): string {
+interface Props {
+  incidents: Incident[];
+}
+
+function formatDueDate(dueDate: string | null | undefined): string {
   if (!dueDate) return "Sin fecha";
 
   const due = new Date(dueDate);
@@ -46,11 +34,7 @@ function formatDueDate(dueDate: string | null): string {
     : due.toLocaleDateString("es-ES");
 }
 
-export default function IncidentsTable({
-  incidents,
-}: {
-  incidents: Incident[];
-}) {
+export default function IncidentsTable({ incidents }: Props) {
   const ITEMS_PER_PAGE = 10;
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +50,7 @@ export default function IncidentsTable({
     const pages = [];
 
     let start = Math.max(1, currentPage - 1);
-    let end = Math.min(totalPages, start + 2);
+    const end = Math.min(totalPages, start + 2);
 
     if (end - start < 2) {
       start = Math.max(1, end - 2);
@@ -141,16 +125,18 @@ export default function IncidentsTable({
                       <div className={styles.assignees}>
                         {incident.assignees
                           ?.slice(0, 3)
-                          .map((assignee, idx) => (
-                            <Image
-                              key={idx}
-                              className={styles.avatar}
-                              src={assignee.avatarUrl}
-                              alt={assignee.name}
-                              width={28}
-                              height={28}
-                            />
-                          ))}
+                          .map((assignee, idx) =>
+                            assignee.avatarUrl ? (
+                              <Image
+                                key={idx}
+                                className={styles.avatar}
+                                src={assignee.avatarUrl}
+                                alt={assignee.name}
+                                width={28}
+                                height={28}
+                              />
+                            ) : null,
+                          )}
 
                         {incident.assignees?.length > 3 && (
                           <div className={styles.avatarCounter}>
