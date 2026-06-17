@@ -138,12 +138,16 @@ export default function IncidentMap() {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [-74.0721, 4.711],
-      zoom: 12,
+      center: [0, 20],
+      zoom: 0.8,
     });
 
     mapRef.current = map;
-    map.on("load", () => map.resize());
+    map.on("load", () => {
+      map.setProjection("globe");
+      map.setFog({});
+      map.resize();
+    });
 
     const resizeObserver = new ResizeObserver(() => mapRef.current?.resize());
     resizeObserver.observe(mapContainer.current);
