@@ -98,10 +98,14 @@ export default function DashboardFilters() {
                   createdBy: value ?? null,
                 })
               }
-              options={creators.map((user) => ({
-                value: user.id,
-                label: user.name,
-              }))}
+              options={creators
+                .filter((user): user is NonNullable<typeof user> =>
+                  Boolean(user),
+                )
+                .map((user) => ({
+                  value: user.id,
+                  label: user.name,
+                }))}
             />
           </div>
 
