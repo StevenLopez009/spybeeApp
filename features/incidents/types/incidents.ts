@@ -6,4 +6,9 @@ export interface Incident {
   status: "open" | "closed" | "on_pause";
   priority: "high" | "medium" | "low";
   dueDate?: string;
+  owner?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  } | null;
 }
