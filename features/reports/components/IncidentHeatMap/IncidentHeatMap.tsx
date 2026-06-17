@@ -5,23 +5,12 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./IncidentHeatMap.module.scss";
 import type { FeatureCollection, Point } from "geojson";
+import type { Incident } from "@/features/incidents/types/incidents";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
-interface IncidentLocation {
-  id: string;
-  title: string;
-  priority: string;
-  status: string;
-
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
-}
-
 interface Props {
-  incidents: IncidentLocation[];
+  incidents: Incident[];
 }
 
 export default function IncidentHeatMap({ incidents }: Props) {
@@ -33,9 +22,11 @@ export default function IncidentHeatMap({ incidents }: Props) {
       type: "FeatureCollection",
       features: incidents
         .filter(
-          (incident) =>
-            typeof incident.coordinates.lat === "number" &&
-            typeof incident.coordinates.lng === "number",
+          (
+            incident,
+          ): incident is Incident & {
+            coordinates: { lat: number; lng: number };
+          } => !!incident.coordinates,
         )
         .map((incident) => ({
           type: "Feature" as const,
