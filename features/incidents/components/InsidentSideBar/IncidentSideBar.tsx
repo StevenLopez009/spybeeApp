@@ -114,7 +114,6 @@ export default function IncidentSidebar({
               {incident.assignees.map((a, i) => (
                 <li key={`${a.name}-${i}`}>
                   <span className={styles.assigneeName}>{a.name}</span>
-                  <span className={styles.assigneeRole}> — {a.role}</span>
                 </li>
               ))}
             </ul>
