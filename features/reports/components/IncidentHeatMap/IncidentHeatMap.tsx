@@ -141,7 +141,6 @@ export default function IncidentHeatMap({ incidents }: Props) {
   return (
     <div className={styles.card}>
       <h3 className={styles.title}>Mapa de calor de incidencias</h3>
-
       <div ref={mapContainer} className={styles.mapContainer} />
     </div>
   );

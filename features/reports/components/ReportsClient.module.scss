@@ -67,8 +67,15 @@
 .mapCalendar {
   margin-top: $spacing-6;
   display: grid;
-  grid-template-columns: 8fr 4fr;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
   gap: $spacing-6;
+
+  width: 100%;
+  align-items: stretch;
+}
+
+.mapCalendar > * {
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {

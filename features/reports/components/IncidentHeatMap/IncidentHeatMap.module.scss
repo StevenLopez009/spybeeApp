@@ -6,6 +6,7 @@
   border-radius: $radius-lg;
   padding: $spacing-4;
   overflow: hidden;
+  min-width: 0;
 }
 
 .title {
@@ -20,6 +21,11 @@
   height: 600px;
   border-radius: $radius-md;
   overflow: hidden;
+  position: relative;
+}
+
+.mapContainer canvas {
+  width: 100% ;
 }
 
 @media (max-width: 1024px) {
