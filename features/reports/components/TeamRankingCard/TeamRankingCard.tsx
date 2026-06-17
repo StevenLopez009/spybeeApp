@@ -36,6 +36,8 @@ export default function TeamRankingCard({
             <Image
               src={item.avatar || "/avatar-placeholder.png"}
               alt={item.name}
+              width={40}
+              height={40}
               className={styles.card__avatar}
             />
 
