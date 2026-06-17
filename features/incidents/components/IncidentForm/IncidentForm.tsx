@@ -92,7 +92,7 @@ export default function IncidentForm({
         {
           id: crypto.randomUUID(),
           name: assigneeDraft.name.trim(),
-          email: assigneeDraft.email.trim(),
+          email: "",
         },
       ],
     }));
