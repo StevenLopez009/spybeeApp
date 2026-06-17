@@ -88,7 +88,7 @@ export default function SideNav({ expanded, onToggle }: SideNavProps) {
         {/* Avatar + botón expandir */}
         <div className={styles.header}>
           <div className={styles.avatar} style={{ clipPath: HEX }}>
-            🐺
+            🐝
           </div>
           {expanded && <span className={styles.accountName}>Mi cuenta</span>}
           <button

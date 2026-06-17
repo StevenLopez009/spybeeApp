@@ -12,7 +12,6 @@ interface MapChromeProps {
   onShowDetails: () => void;
   canShowDetails: boolean;
   onCreateIncident: () => void;
-  /** Solo se puede crear cuando hay una ubicación marcada en el mapa. */
   canCreate: boolean;
 }
 
@@ -179,8 +178,6 @@ export default function MapChrome({
   is360,
   onSet360,
   canOrbit,
-  onShowDetails,
-  canShowDetails,
   onCreateIncident,
   canCreate,
 }: MapChromeProps) {
@@ -188,22 +185,6 @@ export default function MapChrome({
 
   return (
     <>
-      {/* Top-left: Ver detalles */}
-      <button
-        type="button"
-        onClick={onShowDetails}
-        disabled={!canShowDetails}
-        title={
-          canShowDetails
-            ? "Ver información de la incidencia"
-            : "Crea o selecciona una incidencia primero"
-        }
-        className={styles.detailsBtn}
-      >
-        Ver detalles
-        <Svg size={18}>{I.panel}</Svg>
-      </button>
-
       {/* Top-center: filtro + fecha + visitas */}
       <div className={styles.topBar}>
         <button type="button" className={styles.iconBtn} title="Filtros">
@@ -280,9 +261,6 @@ export default function MapChrome({
           </span>
         </button>
       </div>
-
-      {/* Bottom-right: logo */}
-      <div className={styles.logo}>Spybee</div>
 
       <div className={styles.mobileCreate}>
         <CreateButton

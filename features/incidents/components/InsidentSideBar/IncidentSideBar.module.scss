@@ -210,3 +210,46 @@
   border: 1px solid #e5e7eb;
   object-fit: cover;
 }
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badgeUrgente {
+  background: #ef4444;
+}
+
+.badgeAlta {
+  background: #f97316;
+}
+
+.badgeMedia {
+  background: #eab308;
+  color: #111827;
+}
+
+.badgeBaja {
+  background: #22c55e;
+}
+
+.badgeDefault {
+  background: #6b7280;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+.fieldContent {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #1f2937;
+}

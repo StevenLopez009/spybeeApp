@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { ReactNode } from "react";
 import styles from "./IncidentSideBar.module.scss";
 import { IncidentData } from "../../types";
 
@@ -11,25 +11,17 @@ interface IncidentSidebarProps {
 }
 
 const priorityColor: Record<string, string> = {
-  Urgente: "bg-red-500",
-  Alta: "bg-orange-500",
-  Media: "bg-yellow-500",
-  Baja: "bg-green-500",
+  Urgente: styles.badgeUrgente,
+  Alta: styles.badgeAlta,
+  Media: styles.badgeMedia,
+  Baja: styles.badgeBaja,
 };
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-        {label}
-      </p>
-      <div className="mt-1 text-sm text-gray-800">{children}</div>
+      <p className={styles.fieldLabel}>{label}</p>
+      <div className={styles.fieldContent}>{children}</div>
     </div>
   );
 }
@@ -41,7 +33,6 @@ export default function IncidentSidebar({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
-  // Anima la entrada desde la derecha al montar
   useEffect(() => {
     const id = requestAnimationFrame(() => setOpen(true));
     return () => cancelAnimationFrame(id);
@@ -57,7 +48,6 @@ export default function IncidentSidebar({
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, [incident]);
 
-  // Anima la salida antes de desmontar
   const handleClose = () => {
     setOpen(false);
     setTimeout(onClose, 300);
@@ -81,7 +71,6 @@ export default function IncidentSidebar({
       </div>
 
       <div className={styles.body}>
-        {/* Título + prioridad */}
         <div>
           <div className={styles.titleRow}>
             <h3 className={styles.title}>{incident.title || "(Sin título)"}</h3>

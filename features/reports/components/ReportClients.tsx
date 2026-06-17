@@ -49,10 +49,8 @@ export default function ReportsClient({ incidents }: Props) {
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Incidencias</h1>
-
-      <DashboardFilters />
-
       <div className={styles.filters}>
+        <DashboardFilters />
         <RangePicker
           format="DD/MM/YYYY"
           value={dateRange}
