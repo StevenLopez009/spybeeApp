@@ -11,4 +11,9 @@ export interface Incident {
     name: string;
     avatarUrl?: string;
   } | null;
+  assignees: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  }[];
 }
