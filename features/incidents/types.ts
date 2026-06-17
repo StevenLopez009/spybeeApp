@@ -6,9 +6,9 @@ export interface Coordinates {
 }
 
 export interface Assignee {
-  id: string;
+  id?: string;
   name: string;
-  email: string;
+  email?: string;
   avatarUrl?: string;
 }
 

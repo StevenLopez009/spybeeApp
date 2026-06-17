@@ -12,9 +12,9 @@ export interface Incident {
     avatarUrl?: string;
   } | null;
   assignees: {
-    id: string;
+    id?: string;
     name: string;
-    email: string;
+    email?: string;
     avatarUrl?: string;
   }[];
 }

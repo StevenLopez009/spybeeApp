@@ -56,8 +56,9 @@ export default function IncidentForm({
   const [levels, setLevels] = useState<string[]>([...DEFAULT_LEVELS]);
   const [newLevel, setNewLevel] = useState("");
   const [assigneeDraft, setAssigneeDraft] = useState<Assignee>({
+    id: "",
     name: "",
-    role: "",
+    email: "",
   });
 
   const toggleTag = (tag: string) => {
@@ -82,18 +83,25 @@ export default function IncidentForm({
   };
 
   const addAssignee = () => {
-    if (!assigneeDraft.name.trim() || !assigneeDraft.role.trim()) return;
+    if (!assigneeDraft.name.trim()) return;
+
     setFormData((prev) => ({
       ...prev,
       assignees: [
         ...prev.assignees,
         {
+          id: crypto.randomUUID(),
           name: assigneeDraft.name.trim(),
-          role: assigneeDraft.role.trim(),
+          email: assigneeDraft.email.trim(),
         },
       ],
     }));
-    setAssigneeDraft({ name: "", role: "" });
+
+    setAssigneeDraft({
+      id: "",
+      name: "",
+      email: "",
+    });
   };
 
   const removeAssignee = (index: number) => {
@@ -308,7 +316,6 @@ export default function IncidentForm({
                   <li key={`${a.name}-${i}`} className={styles.assigneeItem}>
                     <span className={styles.assigneeText}>
                       <span className={styles.assigneeName}>{a.name}</span>
-                      <span className={styles.assigneeRole}> — {a.role}</span>
                     </span>
                     <button
                       type="button"
@@ -329,20 +336,6 @@ export default function IncidentForm({
                   setAssigneeDraft({ ...assigneeDraft, name: e.target.value })
                 }
                 placeholder="Nombre"
-                className={styles.assigneeField}
-              />
-              <input
-                value={assigneeDraft.role}
-                onChange={(e) =>
-                  setAssigneeDraft({ ...assigneeDraft, role: e.target.value })
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addAssignee();
-                  }
-                }}
-                placeholder="Cargo"
                 className={styles.assigneeField}
               />
               <button
@@ -373,7 +366,7 @@ export default function IncidentForm({
               </option>
               {formData.assignees.map((a, i) => (
                 <option key={`${a.name}-${i}`} value={a.name}>
-                  {a.name} ({a.role})
+                  {a.name}
                 </option>
               ))}
             </select>
