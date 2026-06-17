@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./IncidentHeatMap.module.scss";
-import { FeatureCollection, Point } from "geojson";
+import type { Feature, FeatureCollection, Point } from "geojson";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -37,21 +37,19 @@ export default function IncidentHeatMap({ incidents }: Props) {
             typeof incident.coordinates.lat === "number" &&
             typeof incident.coordinates.lng === "number",
         )
-        .map(
-          (incident): Feature<Point> => ({
-            type: "Feature",
-            properties: {
-              id: incident.id,
-              title: incident.title,
-              priority: incident.priority,
-              status: incident.status,
-            },
-            geometry: {
-              type: "Point",
-              coordinates: [incident.coordinates.lng, incident.coordinates.lat],
-            },
-          }),
-        ),
+        .map((incident) => ({
+          type: "Feature" as const,
+          properties: {
+            id: incident.id,
+            title: incident.title,
+            priority: incident.priority,
+            status: incident.status,
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: [incident.coordinates.lng, incident.coordinates.lat],
+          },
+        })),
     }),
     [incidents],
   );
