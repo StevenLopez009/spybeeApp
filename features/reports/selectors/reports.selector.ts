@@ -1,7 +1,16 @@
-import dayjs from "dayjs";
-import { Incident } from "@/features/incidents/types/incidents";
+import dayjs, { Dayjs } from "dayjs";
+import type { Incident } from "@/features/incidents/types/incidents";
 
-export function getProcessedData(incidents: Incident[], dateRange: any) {
+interface RankingItem {
+  id: string;
+  name: string;
+  avatar?: string;
+  value: number;
+}
+
+type DateRange = [Dayjs | null, Dayjs | null] | null;
+
+export function getProcessedData(incidents: Incident[], dateRange: DateRange) {
   const [start, end] = dateRange || [null, null];
 
   const filtered = incidents.filter((incident) => {
@@ -34,7 +43,8 @@ export function getProcessedData(incidents: Incident[], dateRange: any) {
 
     const isActive = i.status === "open" || i.status === "on_pause";
 
-    const isOverdue = i.dueDate && new Date(i.dueDate) < new Date() && isActive;
+    const isOverdue =
+      !!i.dueDate && new Date(i.dueDate) < new Date() && isActive;
 
     if (isOverdue) overdue++;
   });
@@ -63,8 +73,8 @@ export function getProcessedData(incidents: Incident[], dateRange: any) {
   };
 }
 
-export function getTopReporters(incidents: Incident[]) {
-  const grouped = incidents.reduce(
+export function getTopReporters(incidents: Incident[]): RankingItem[] {
+  const grouped = incidents.reduce<Record<string, RankingItem>>(
     (acc, incident) => {
       const owner = incident.owner;
 
@@ -83,66 +93,64 @@ export function getTopReporters(incidents: Incident[]) {
 
       return acc;
     },
-    {} as Record<string, any>,
+    {},
   );
 
   return Object.values(grouped)
-    .sort((a: any, b: any) => b.value - a.value)
+    .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 }
 
-export function getTopResolvers(incidents: Incident[]) {
+export function getTopResolvers(incidents: Incident[]): RankingItem[] {
   const grouped = incidents
     .filter((i) => i.status === "closed")
-    .reduce(
-      (acc, incident) => {
-        incident.assignees?.forEach((assignee) => {
-          if (!acc[assignee.id]) {
-            acc[assignee.id] = {
-              id: assignee.id,
-              name: assignee.name,
-              avatar: assignee.avatarUrl,
-              value: 0,
-            };
-          }
+    .reduce<Record<string, RankingItem>>((acc, incident) => {
+      incident.assignees.forEach((assignee) => {
+        if (!assignee.id) return;
 
-          acc[assignee.id].value++;
-        });
+        if (!acc[assignee.id]) {
+          acc[assignee.id] = {
+            id: assignee.id,
+            name: assignee.name,
+            avatar: assignee.avatarUrl,
+            value: 0,
+          };
+        }
 
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+        acc[assignee.id].value++;
+      });
+
+      return acc;
+    }, {});
 
   return Object.values(grouped)
-    .sort((a: any, b: any) => b.value - a.value)
+    .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 }
 
-export function getCurrentWorkload(incidents: Incident[]) {
+export function getCurrentWorkload(incidents: Incident[]): RankingItem[] {
   const grouped = incidents
     .filter((i) => i.status !== "closed")
-    .reduce(
-      (acc, incident) => {
-        incident.assignees?.forEach((assignee) => {
-          if (!acc[assignee.id]) {
-            acc[assignee.id] = {
-              id: assignee.id,
-              name: assignee.name,
-              avatar: assignee.avatarUrl,
-              value: 0,
-            };
-          }
+    .reduce<Record<string, RankingItem>>((acc, incident) => {
+      incident.assignees.forEach((assignee) => {
+        if (!assignee.id) return;
 
-          acc[assignee.id].value++;
-        });
+        if (!acc[assignee.id]) {
+          acc[assignee.id] = {
+            id: assignee.id,
+            name: assignee.name,
+            avatar: assignee.avatarUrl,
+            value: 0,
+          };
+        }
 
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+        acc[assignee.id].value++;
+      });
+
+      return acc;
+    }, {});
 
   return Object.values(grouped)
-    .sort((a: any, b: any) => b.value - a.value)
+    .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 }
