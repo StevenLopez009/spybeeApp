@@ -27,7 +27,11 @@ export default function DashboardFilters() {
     return [
       ...new Map(
         incidents.flatMap((incident) =>
-          incident.assignees.map((assignee) => [assignee.id, assignee]),
+          incident.assignees
+            .filter((assignee): assignee is typeof assignee & { id: string } =>
+              Boolean(assignee.id),
+            )
+            .map((assignee) => [assignee.id, assignee]),
         ),
       ).values(),
     ];

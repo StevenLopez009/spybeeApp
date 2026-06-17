@@ -11,5 +11,9 @@ export async function getIncidents(): Promise<Incident[]> {
     throw new Error("Error loading incidents");
   }
 
-  return response.json();
+  const data = await response.json();
+
+  console.log("INCIDENT SAMPLE", JSON.stringify(data[0], null, 2));
+
+  return data;
 }
