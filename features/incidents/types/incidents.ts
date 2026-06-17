@@ -14,6 +14,7 @@ export interface Incident {
   assignees: {
     id: string;
     name: string;
+    email: string;
     avatarUrl?: string;
   }[];
 }

@@ -6,8 +6,10 @@ export interface Coordinates {
 }
 
 export interface Assignee {
+  id: string;
   name: string;
-  role: string; // cargo
+  email: string;
+  avatarUrl?: string;
 }
 
 export interface IncidentData {
@@ -15,13 +17,13 @@ export interface IncidentData {
   description: string;
   category: string;
   priority: "Baja" | "Media" | "Alta" | "Urgente";
-  dueDate?: string; // fecha de vencimiento (YYYY-MM-DD)
-  tags: string[]; // pisos / niveles
+  dueDate?: string;
+  tags: string[];
   assignees: Assignee[];
-  observer?: string; // quien hace la observación
+  observer?: string;
   coordinates: Coordinates;
   address?: string;
-  locationDetails?: string; // detalles de la localización
+  locationDetails?: string;
   images?: File[];
 }
 
